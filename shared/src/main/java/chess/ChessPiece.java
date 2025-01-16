@@ -95,6 +95,12 @@ public class ChessPiece {
             moves = PawnMoves(board, myPosition);
         } else if (piece.equals(PieceType.BISHOP)) {
             moves = BishopMoves(board, myPosition);
+        } else if (piece.equals(PieceType.ROOK)) {
+            moves = RookMoves(board,myPosition);
+        } else if (piece.equals(PieceType.QUEEN)) {
+            moves = QueenMoves(board, myPosition);
+        } else if (piece.equals(PieceType.KING)) {
+            moves = KingMoves(board, myPosition);
         }
         return moves;
     }
@@ -181,5 +187,61 @@ public class ChessPiece {
         return moves;
     }
 
+    public Collection<ChessPosition> RookMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessPosition> moves = new ArrayList<>();
+        ChessGame.TeamColor color = board.getPiece(myPosition).getTeamColor();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+        // check spaces in front
+        for (int i = 1; row+i<9; i++) {
+            if (board.getPiece(new ChessPosition(row+i,col))==null) {
+                moves.add(new ChessPosition(row+i,col));
+            } else if (board.getPiece(new ChessPosition(row+i,col)).getTeamColor()!=color) {
+                moves.add(new ChessPosition(row+i,col));
+                break;
+            } else { break;}
+        }
+        // check behind
+        for (int i = 1; row-i>0; i++) {
+            if (board.getPiece(new ChessPosition(row-i,col))==null) {
+                moves.add(new ChessPosition(row-i,col));
+            } else if (board.getPiece(new ChessPosition(row-i,col)).getTeamColor()!=color) {
+                moves.add(new ChessPosition(row-i,col));
+                break;
+            } else { break;}
+        }
+        // check right
+        for (int i=1;col+i<9;i++) {
+            if (board.getPiece(new ChessPosition(row,col+i))==null) {
+                moves.add(new ChessPosition(row,col+i));
+            } else if (board.getPiece(new ChessPosition(row,col+i)).getTeamColor()!=color) {
+                moves.add(new ChessPosition(row,col+i));
+                break;
+            } else {break;}
+        }
+        // check left
+        for (int i=1;col-i>0;i++) {
+            if (board.getPiece(new ChessPosition(row,col-i))==null) {
+                moves.add(new ChessPosition(row,col-i));
+            } else if (board.getPiece(new ChessPosition(row,col-i)).getTeamColor()!=color) {
+                moves.add(new ChessPosition(row,col-i));
+                break;
+            } else {break;}
+        }
+
+        return moves;
+    }
+
+    public Collection<ChessPosition> QueenMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessPosition> moves = new ArrayList<>();
+        moves = BishopMoves(board, myPosition);
+        moves.addAll(RookMoves(board, myPosition));
+        return moves;
+    }
+
+    public Collection<ChessPosition> KingMoves(ChessBoard board, ChessPosition myPosition) {
+
+    }
 }
 //
