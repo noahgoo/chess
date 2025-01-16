@@ -93,6 +93,8 @@ public class ChessPiece {
         Collection<ChessPosition> moves = new ArrayList<>();
         if (piece.equals(PieceType.PAWN)) {
             moves = PawnMoves(board, myPosition);
+        } else if (piece.equals(PieceType.BISHOP)) {
+            moves = BishopMoves(board, myPosition);
         }
         return moves;
     }
@@ -127,41 +129,56 @@ public class ChessPiece {
             moves.add(new ChessPosition(myPosition.getRow() + i, myPosition.getColumn() - 1));
         }
         return moves;
+    }
 
-        // moves for WHITE
-        // check for space in front and two spaces in front if in starting row
-//        if (piece.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
-//            if (myPosition.getRow()!=8 && board.getPiece(new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn())) == null) {
-//                moves.add(new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn()));
-//                if (myPosition.getRow() == 2 && board.getPiece(new ChessPosition(myPosition.getRow() + 2, myPosition.getColumn())) == null) {
-//                    moves.add(new ChessPosition(myPosition.getRow() + 2, myPosition.getColumn()));
-//                }
-//                // check for diagonal enemies to capture
-//            } else if (board.getPiece(new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1)).getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
-//                moves.add(new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1));
-//            } else if (board.getPiece(new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1)).getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
-//                moves.add(new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1));
-//            }
-//            return moves;
-//            // moves for BLACK
-//            // check space in front and starting position
-//        } else if (piece.getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
-//            if (myPosition.getRow()!=1 && board.getPiece(new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn())) == null) {
-//                moves.add(new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn()));
-//                if (myPosition.getRow() == 7 && board.getPiece(new ChessPosition(myPosition.getRow() - 2, myPosition.getColumn())) == null) {
-//                    moves.add(new ChessPosition(myPosition.getRow() - 2, myPosition.getColumn()));
-//                }
-//                // check for diagonal enemies to capture
-//            } else if (board.getPiece(new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1)).getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
-//                moves.add(new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1));
-//            } else if (board.getPiece(new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1)).getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
-//                moves.add(new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1));
-//            }
-//            return moves;
-//        }
+    public Collection<ChessPosition> BishopMoves(ChessBoard board, ChessPosition myPosition) {
+        // create an array for possible moves and set variable for the piece, set row/col
+        Collection<ChessPosition> moves = new ArrayList<>();
+        ChessPiece piece = board.getPiece(myPosition);
+        ChessGame.TeamColor color = piece.getTeamColor();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
 
+        // check up and right diagonal
+        for (int i = 1; row+i < 9 && col+i < 9; i++) {
+            if (board.getPiece(new ChessPosition(row+i,col+i))== null) {
+                moves.add(new ChessPosition(row+i,col+i));
+            } else if (board.getPiece(new ChessPosition(row+i,col+i)).getTeamColor()!=color) {
+                    moves.add(new ChessPosition(row+i,col+i));
+                    break;
+            } else { break;}
+        }
 
+        // check up and left diagonal
+        for (int i = 1; row+i < 9 && col-i > 0; i++) {
+            if (board.getPiece(new ChessPosition(row + i, col - i)) == null) {
+                moves.add(new ChessPosition(row + i, col - i));
+            } else if (board.getPiece(new ChessPosition(row+i,col-i)).getTeamColor()!=color) {
+                    moves.add(new ChessPosition(row+i,col-i));
+                    break;
+            } else { break;}
+        }
 
+        // check down and right diagonal
+        for (int i = 1; row-i > 0 && col+i < 9; i++) {
+            if (board.getPiece(new ChessPosition(row-i,col+i))== null) {
+                moves.add(new ChessPosition(row-i,col+i));
+            } else if (board.getPiece(new ChessPosition(row-i,col+i)).getTeamColor()!=color) {
+                moves.add(new ChessPosition(row - i, col + i));
+                break;
+            } else { break;}
+        }
+
+        // check down and left diagonal
+        for (int i = 1; row-i > 0 && col-i > 0; i++) {
+            if (board.getPiece(new ChessPosition(row - i, col - i)) == null) {
+                moves.add(new ChessPosition(row - i, col - i));
+            } else if (board.getPiece(new ChessPosition(row-i,col-i)).getTeamColor()!=color) {
+                moves.add(new ChessPosition(row-i,col-i));
+                break;
+            } else { break;}
+        }
+        return moves;
     }
 
 }
