@@ -241,7 +241,34 @@ public class ChessPiece {
     }
 
     public Collection<ChessPosition> KingMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessPosition> moves = new ArrayList<>();
+        ChessGame.TeamColor color = board.getPiece(myPosition).getTeamColor();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        
+        // check all squares around King
+        for (int i=-1;i<=1;i++) {
+            for (int j=-1;j<=1;j++) {
+                if (i != 0 || j != 0) {
+                    if (checkSquare(board, new ChessPosition(row+i,col+j), color)) {
+                        moves.add(new ChessPosition(row+i,col+j));
+                    }
+                }
+            }
+        }
+        
+        return moves;
+    }
 
+    private boolean checkSquare(ChessBoard board, ChessPosition position, ChessGame.TeamColor color) {
+        if (position.getRow() > 0 && position.getRow() < 9 && position.getColumn() > 0 && position.getColumn() < 9) {
+            if (board.getPiece(position) == null) {
+                return true;
+            } else {
+                return board.getPiece(position).getTeamColor() != color;
+            }
+        }
+        return false;
     }
 }
 //
