@@ -12,7 +12,7 @@ import java.util.Objects;
  */
 public class ChessPiece {
     final private ChessGame.TeamColor teamColor;
-    private ChessPiece.PieceType pieceType;
+    final private ChessPiece.PieceType pieceType;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.teamColor = pieceColor;
@@ -96,7 +96,7 @@ public class ChessPiece {
     public Collection<ChessPosition> pieceMovesCalculator(ChessBoard board, ChessPosition myPosition) {
         // determine pieceType and initialize arrayList for potential moves
         PieceType piece = board.getPiece(myPosition).getPieceType();
-        Collection<ChessPosition> moves = new ArrayList<>();
+        Collection<ChessPosition> moves;
         if (piece.equals(PieceType.PAWN)) {
             moves = PawnMoves(board, myPosition);
         } else if (piece.equals(PieceType.BISHOP)) {
@@ -245,7 +245,7 @@ public class ChessPiece {
     }
 
     public Collection<ChessPosition> QueenMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessPosition> moves = new ArrayList<>();
+        Collection<ChessPosition> moves;
         moves = BishopMoves(board, myPosition);
         moves.addAll(RookMoves(board, myPosition));
         return moves;
