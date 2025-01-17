@@ -101,7 +101,9 @@ public class ChessPiece {
             moves = QueenMoves(board, myPosition);
         } else if (piece.equals(PieceType.KING)) {
             moves = KingMoves(board, myPosition);
-        }
+        } else if (piece.equals(PieceType.KNIGHT)) {
+            moves = KnightMoves(board, myPosition);
+        } else { throw new RuntimeException("not a valid piece");}
         return moves;
     }
 
@@ -257,6 +259,27 @@ public class ChessPiece {
             }
         }
         
+        return moves;
+    }
+
+    public Collection<ChessPosition> KnightMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessPosition> moves = new ArrayList<>();
+        ChessGame.TeamColor color = board.getPiece(myPosition).getTeamColor();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+        // check up and down, left and right
+        for (int i = -2;i<3;i+=4) {
+            for (int j = -1;j<2;j+=2) {
+                if (checkSquare(board, new ChessPosition(row+i,col+j), color)) {
+                    moves.add(new ChessPosition(row+i,col+j));
+                }
+                if (checkSquare(board, new ChessPosition(row+j,col+i),color)) {
+                    moves.add(new ChessPosition(row+j,col+i));
+                }
+            }
+        }
+
         return moves;
     }
 
