@@ -9,9 +9,9 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessMove {
-        private ChessPosition startPosition;
-        private ChessPosition endPosition;
-        private ChessPiece.PieceType promotionPiece;
+        final private ChessPosition startPosition;
+        final private ChessPosition endPosition;
+        final private ChessPiece.PieceType promotionPiece;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
@@ -58,11 +58,11 @@ public class ChessMove {
             return false;
         }
         ChessMove chessMove = (ChessMove) o;
-        return Objects.equals(startPosition, chessMove.startPosition) && Objects.equals(endPosition, chessMove.endPosition);
+        return Objects.equals(startPosition, chessMove.startPosition) && Objects.equals(endPosition, chessMove.endPosition) && promotionPiece == chessMove.promotionPiece;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(startPosition, endPosition);
+        return Objects.hash(startPosition, endPosition, promotionPiece);
     }
 }
