@@ -10,8 +10,8 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessBoard {
-    private final ChessPiece[][] board = new ChessPiece[8][8];
+public class ChessBoard implements Cloneable {
+    private ChessPiece[][] board = new ChessPiece[8][8];
 
     public ChessBoard() {
 
@@ -60,6 +60,8 @@ public class ChessBoard {
         return board;
     }
 
+
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
@@ -67,6 +69,22 @@ public class ChessBoard {
         }
         ChessBoard that = (ChessBoard) o;
         return Objects.deepEquals(board, that.board);
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        ChessBoard clonedBoard = (ChessBoard) super.clone(); // Shallow copy of ChessBoard object
+
+        clonedBoard.board = new ChessPiece[8][8];
+        // Deep copy the board array
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (board[i][j] != null) {
+                    clonedBoard.board[i][j] = (ChessPiece) board[i][j].clone(); // Deep copy each piece
+                }
+            }
+        }
+        return clonedBoard;
     }
 
     @Override

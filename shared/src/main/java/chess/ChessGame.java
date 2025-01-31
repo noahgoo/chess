@@ -51,16 +51,23 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         // Check if there is a piece in the startPosition first
+        try {
         if (board.getPiece(startPosition)==null) {
             return null;
         } else {
             Collection<ChessMove> moves = board.getPiece(startPosition).pieceMoves(board, startPosition);
             for (ChessMove move: moves) {
+                ChessBoard clone = (ChessBoard) board.clone();
 
             }
 
+
             return moves;
         }
+    } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
     }
 
     /**
@@ -70,9 +77,6 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        try {
-
-        }
     }
 
     /**

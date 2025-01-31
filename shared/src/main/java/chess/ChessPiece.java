@@ -11,7 +11,7 @@ import chess.MovesCalc.*;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessPiece {
+public class ChessPiece implements Cloneable {
     private final ChessGame.TeamColor teamColor;
     private final PieceType pieceType;
 
@@ -27,6 +27,11 @@ public class ChessPiece {
         }
         ChessPiece that = (ChessPiece) o;
         return teamColor == that.teamColor && pieceType == that.pieceType;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return (ChessPiece) super.clone();
     }
 
     @Override
