@@ -13,48 +13,27 @@ public class bishopCalculator implements movesCalculator {
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> moves = new ArrayList<>();
+        Collection<ChessMove> moves = helper(board, myPosition, 1, 1);
+        moves.addAll(helper(board, myPosition, -1, 1));
+        moves.addAll(helper(board, myPosition, 1, -1));
+        moves.addAll(helper(board, myPosition, -1, -1));
+        return moves;
+    }
+
+
+    private Collection<ChessMove> helper(ChessBoard board, ChessPosition myPosition, int r, int c) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
-        ChessGame.TeamColor color = board.getPiece(myPosition).getTeamColor();
-
-        for (int i=1;row+i<9&&col+i<9;i++) {
-            ChessPosition potential = new ChessPosition(row+i,col+i);
+        Collection<ChessMove> directionMoves = new ArrayList<>();
+        for (int i=1; row+r*i<9&&row+r*i>0&&col+c*i<9&&col+c*i>0; i++) {
+            ChessPosition potential = new ChessPosition(row+r*i, col+c*i);
             if (board.getPiece(potential)==null) {
-                moves.add(new ChessMove(myPosition, potential, null));
-            } else if (board.getPiece(potential).getTeamColor()!=color) {
-                moves.add(new ChessMove(myPosition, potential, null));
+                directionMoves.add(new ChessMove(myPosition, potential, null));
+            } else if (board.getPiece(potential).getTeamColor()!=board.getPiece(myPosition).getTeamColor()) {
+                directionMoves.add(new ChessMove(myPosition, potential, null));
                 break;
             } else {break;}
         }
-        for (int i=1;row-i>0&&col+i<9;i++) {
-            ChessPosition potential = new ChessPosition(row-i,col+i);
-            if (board.getPiece(potential)==null) {
-                moves.add(new ChessMove(myPosition, potential, null));
-            } else if (board.getPiece(potential).getTeamColor()!=color) {
-                moves.add(new ChessMove(myPosition, potential, null));
-                break;
-            } else {break;}
-        }
-        for (int i=1;row+i<9&&col-i>0;i++) {
-            ChessPosition potential = new ChessPosition(row+i,col-i);
-            if (board.getPiece(potential)==null) {
-                moves.add(new ChessMove(myPosition, potential, null));
-            } else if (board.getPiece(potential).getTeamColor()!=color) {
-                moves.add(new ChessMove(myPosition, potential, null));
-                break;
-            } else {break;}
-        }
-        for (int i=1;row-i>0&&col-i>0;i++) {
-            ChessPosition potential = new ChessPosition(row-i,col-i);
-            if (board.getPiece(potential)==null) {
-                moves.add(new ChessMove(myPosition, potential, null));
-            } else if (board.getPiece(potential).getTeamColor()!=color) {
-                moves.add(new ChessMove(myPosition, potential, null));
-                break;
-            } else {break;}
-        }
-
-        return moves;
+        return directionMoves;
     }
 }
