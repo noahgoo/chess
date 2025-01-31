@@ -56,18 +56,29 @@ public class ChessGame {
             return null;
         } else {
             Collection<ChessMove> moves = board.getPiece(startPosition).pieceMoves(board, startPosition);
+            Collection<ChessMove> invalidMoves = new ArrayList<>();
+            ChessPiece piece = board.getPiece(startPosition);
+            TeamColor teamColor = piece.getTeamColor();
             for (ChessMove move: moves) {
-                ChessBoard clone = (ChessBoard) board.clone();
-
+                ChessBoard clone = (ChessBoard) board.clone(); // clone the board
+                ChessBoard temp = board;
+                board = clone;
+                // make the move and test for check
+                board.addPiece(move.getStartPosition(), null);
+                board.addPiece(move.getEndPosition(), piece);
+                if (isInCheck(teamColor)) {
+                    invalidMoves.add(move);
+                }
+                board = temp;
             }
 
-
+            moves.removeAll(invalidMoves);
             return moves;
         }
     } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }
-        return new ArrayList<>();
+        return null;
     }
 
     /**
@@ -88,9 +99,9 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         // find King's position
         ChessPosition king = null;
-        for (int row = 0; row<board.getBoard().length;row++) {
-            for (int col = 0; col<board.getBoard()[row].length;col++) {
-                ChessPiece piece = board.getPiece(new ChessPosition(row+1,col+1));
+        for (int row = 1; row<9 ;row++) {
+            for (int col = 1; col<9 ;col++) {
+                ChessPiece piece = board.getPiece(new ChessPosition(row,col));
                 if (piece!=null&&piece.getPieceType().equals(ChessPiece.PieceType.KING)&&piece.getTeamColor().equals(teamColor)) {
                     king = new ChessPosition(row, col);
                 }
@@ -98,13 +109,13 @@ public class ChessGame {
         }
 
         // make sure no opposing players can move on the king
-        for (int row = 0; row<board.getBoard().length;row++) {
-            for (int col = 0; col<board.getBoard()[row].length;col++) {
-                ChessPiece piece = board.getPiece(new ChessPosition(row+1, col+1));
+        for (int row = 1; row<9;row++) {
+            for (int col = 1; col<9;col++) {
+                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
                 if (piece!=null&&piece.getTeamColor()!=teamColor) {
-                    Collection<ChessMove> potentialMoves = piece.pieceMoves(board, new ChessPosition(row+1,col+1));
+                    Collection<ChessMove> potentialMoves = piece.pieceMoves(board, new ChessPosition(row,col));
                     for (ChessMove move: potentialMoves) {
-                        if (move.getEndPosition()==king) {
+                        if (move.getEndPosition().equals(king)) {
                             return true;
                         }
                     }
