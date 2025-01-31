@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -126,7 +125,6 @@ public class ChessGame {
                 }
             }
         }
-
         // make sure no opposing players can move on the king
         for (int row = 1; row<9;row++) {
             for (int col = 1; col<9;col++) {
@@ -152,7 +150,35 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        try {
+        if (isInCheck(teamColor)) {
+            for (int row = 1; row<9; row++) {
+                for (int col = 1; col<9; col++) {
+                    if (board.getPiece(new ChessPosition(row, col))!=null&&board.getPiece(new ChessPosition(row, col)).getTeamColor().equals(teamColor)) {
+                        Collection<ChessMove> potentialMoves = board.getPiece(new ChessPosition(row, col)).pieceMoves(board, new ChessPosition(row, col));
+                        for (ChessMove move: potentialMoves) {
+                            ChessBoard clone = (ChessBoard) board.clone(); // clone the board
+                            ChessBoard temp = board;
+                            board = clone;
+                            try {
+                                makeMove(move);
+                                if (!isInCheck(teamColor)) {
+                                    return false;
+                                }
+                            } catch (InvalidMoveException e) {
+                                continue;
+                            }
+                            board = temp;
+                        }
+
+                    }
+                }
+            } return true;
+        }
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -163,7 +189,18 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (!isInCheck(teamColor)) {
+            for (int row = 1; row<9; row++) {
+                for (int col = 1; col<9; col++) {
+                    ChessPosition myPosition = new ChessPosition(row, col);
+                    if (board.getPiece(myPosition)!=null&&board.getPiece(myPosition).getTeamColor().equals(teamColor)) {
+                        if (!validMoves(myPosition).isEmpty()) {
+                            return false;
+                        }
+                    }
+                }
+            } return true;
+        } return false;
     }
 
     /**
