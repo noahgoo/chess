@@ -5,15 +5,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.*;
 import Service.LoginService;
+import Request.LoginRequest;
 
 public class LoginHandler {
     private static final Logger log = LoggerFactory.getLogger(LoginHandler.class);
     private static final LoginService loginService = new LoginService();
 
     public Response login(Request request, Response response) {
-        String loginRequest = getBody(request);
+        String body = getBody(request);
+        // create LoginRequest object with username and password
+
         // perform login request
-        response = loginService.login(loginRequest);
+        response = loginService.login(body /*login request*/);
     }
 
     // read the Json

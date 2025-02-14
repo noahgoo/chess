@@ -13,6 +13,6 @@ public class LoginService {
         String user = userDao.getUser(loginRequest);
         // create AuthData
         String authToken = authDAO.createAuth();
-        Response loginResult = new Response()
+
     }
 }
