@@ -1,4 +1,4 @@
-package DAO;
+package dataaccess;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,5 +12,9 @@ public class MemoryAuthDAO implements AuthDAO {
         String token = UUID.randomUUID().toString();
         authMap.add(token);
         return token;
+    }
+
+    public void clearAuth() {
+        authMap.clear();
     }
 }

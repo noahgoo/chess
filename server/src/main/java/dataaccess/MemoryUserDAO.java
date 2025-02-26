@@ -1,4 +1,4 @@
-package DAO;
+package dataaccess;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,5 +13,9 @@ public class MemoryUserDAO implements UserDAO {
         } else {
             return "Error: not found";
         }
+    }
+
+    public void clearUser() {
+        userMap.clear();
     }
 }
