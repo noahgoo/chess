@@ -30,7 +30,9 @@ public class Server {
 
     private static void createRoutes() {
         Spark.post("/session", (request, response) -> userHandler.login(request, response) );
-        Spark.delete("/db", clearHandler::clear);
         Spark.post("/user" , (request, response) -> userHandler.register(request, response) );
+        // Spark.delete("/session", ((request, response) -> userHandler.logout(request, response)));
+
+        Spark.delete("/db", (request, response) -> clearHandler.clear(request, response));
     }
 }

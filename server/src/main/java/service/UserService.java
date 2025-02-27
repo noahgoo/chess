@@ -1,26 +1,32 @@
 package service;
 
 import Request.*;
-import Result.LoginResult;
+import Result.*;
 import dataaccess.DataAccessException;
 import model.UserData;
 
 public class UserService extends Service {
 
+    public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
+        UserData userData = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
+        if (userDao.getUser(userData)==null) {
+            userDao.createUser(userData);
+            String token = authDao.createAuth(userData.username());
+            RegisterResult registerResult = new RegisterResult(userData.username(), token);
+            return registerResult;
+        } else {
+            throw new DataAccessException("Error: already taken");
+        }
+    }
 
     public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
-        var userData = new UserData(loginRequest.username(), loginRequest.password(), null);
+        UserData userData = new UserData(loginRequest.username(), loginRequest.password(), null);
 
-        // check for user
-        try {
-            userDao.getUser(userData);
-        } catch (DataAccessException e) {
-            throw new DataAccessException(e.getMessage());
+        if (userDao.getUser(userData)==null) {
+            throw new DataAccessException("Error: unauthorized");
         }
-
         // create new Auth
         String auth = authDao.createAuth(userData.username());
-
         return new LoginResult(userData.username(), auth);
     }
 }

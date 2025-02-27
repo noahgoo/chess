@@ -13,14 +13,18 @@ public class MemoryUserDAO implements UserDAO {
     private final static HashMap<String, UserData> userMap = new HashMap();
 
     @Override
-    public UserData getUser(UserData user) throws DataAccessException {
-        userMap.put("testUser", new UserData("testUser", "testPassword", null));
+    public UserData getUser(UserData user) {
 
         if ((userMap.containsKey(user.username()))&&(userMap.get(user.username()).password().equals(user.password()))) {
             return user;
         } else {
-            throw new DataAccessException("Error: no known user");
+            return null;
         }
+    }
+
+    @Override
+    public void createUser(UserData user) {
+        userMap.put(user.username(), user);
     }
 
     public void clearUser() {

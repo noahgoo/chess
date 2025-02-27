@@ -2,6 +2,7 @@ package passoff.server;
 
 import Handler.UserHandler;
 import Request.LoginRequest;
+import Request.RegisterRequest;
 import Result.LoginResult;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
@@ -40,7 +41,7 @@ public class LoginTests {
             loginService.login(loginRequest);
         });
 
-        assertEquals("Error: no known user", e.getMessage());
+        assertEquals("Error: unauthorized", e.getMessage());
 
         }
 
@@ -48,6 +49,7 @@ public class LoginTests {
     public void loginSuccess() throws DataAccessException {
         var loginRequest = new LoginRequest("testUser", "testPassword");
         var loginService = new UserService();
+        loginService.register(new RegisterRequest("testUser", "testPassword", "testEmail"));
 
         var actualLoginResponse = loginService.login(loginRequest);
         var expectedLoginResponse = new LoginResult("testUser", actualLoginResponse.authToken());
