@@ -1,13 +1,11 @@
 package server;
 
 import Handler.ClearHandler;
-import Handler.LoginHandler;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Response;
+import Handler.UserHandler;
 import spark.*;
 
 public class Server {
-    private static final LoginHandler loginHandler = new LoginHandler();
+    private static final UserHandler userHandler = new UserHandler();
     private static final ClearHandler clearHandler = new ClearHandler();
 
     public int run(int desiredPort) {
@@ -19,7 +17,7 @@ public class Server {
         createRoutes();
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
-        Spark.init();
+        // Spark.init();
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -31,7 +29,8 @@ public class Server {
     }
 
     private static void createRoutes() {
-        Spark.get("/session", (request, response) -> loginHandler.login(request, response));
-        Spark.get("/db", (request, response) -> clearHandler.clear(request, response));
+        Spark.post("/session", (request, response) -> userHandler.login(request, response) );
+        Spark.delete("/db", clearHandler::clear);
+        Spark.post("/user" , (request, response) -> userHandler.register(request, response) );
     }
 }

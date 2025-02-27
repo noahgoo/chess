@@ -1,17 +1,25 @@
 package dataaccess;
 
+import model.UserData;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import dataaccess.DataAccessException;
 
 public class MemoryUserDAO implements UserDAO {
-    private final static List<String> userMap = new ArrayList<>();
+    private final static HashMap<String, UserData> userMap = new HashMap();
 
     @Override
-    public String getUser(String request) {
-        if (userMap.contains(request)) {
-            return request;
+    public UserData getUser(UserData user) throws DataAccessException {
+        userMap.put("testUser", new UserData("testUser", "testPassword", null));
+
+        if ((userMap.containsKey(user.username()))&&(userMap.get(user.username()).password().equals(user.password()))) {
+            return user;
         } else {
-            return "Error: not found";
+            throw new DataAccessException("Error: no known user");
         }
     }
 
