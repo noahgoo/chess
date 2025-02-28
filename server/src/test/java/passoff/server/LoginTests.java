@@ -19,19 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class LoginTests {
 
     @Test
-    public void readJSONBody() {
-        var serializer = new Gson();
-        var user = new UserData("testUser", "testPassword", "testEmail");
-        var json = serializer.toJson(user);
-
-        Map<String, String> jsonBody = new HashMap<>();
-        jsonBody.put("username", "testUser");
-        jsonBody.put("password", "testPassword");
-
-        UserHandler loginTest = new UserHandler();
-    }
-
-    @Test
     public void loginFail() {
         // var user = new UserData("testUser", "testPassword", null);
 
