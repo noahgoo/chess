@@ -45,8 +45,7 @@ public class UserHandler extends Handler {
     public String logout(Request request, Response response) {
         try {
             // check authToken
-            String authToken = request.headers("authorization");
-            AuthData authData = checkAuth(authToken);
+            AuthData authData = checkAuth(request);
             userService.logout(authData);
             response.status(200);
             return "{}";

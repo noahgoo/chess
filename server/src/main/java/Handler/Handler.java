@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import service.ClearService;
+import service.GameService;
 import service.Service;
 import service.UserService;
 import spark.Request;
@@ -13,6 +14,7 @@ import java.util.Set;
 public class Handler {
     protected final static ClearService clearService = new ClearService();
     protected final static UserService userService = new UserService();
+    protected final static GameService gameService = new GameService();
     final static Gson serializer = new Gson();
 
     public <T> T createObj(Request request, Class<T> clazz) {
@@ -24,8 +26,8 @@ public class Handler {
         return serializer.toJson(obj);
     }
 
-    public AuthData checkAuth(String authToken) throws DataAccessException {
-        AuthData authData = userService.authDao.getAuth(authToken);
+    public AuthData checkAuth(Request request) throws DataAccessException {
+        AuthData authData = userService.authDao.getAuth(request.headers("authorization"));
         if (authData!=null) {
             return authData;
         } else {
