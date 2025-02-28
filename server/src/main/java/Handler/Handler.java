@@ -1,9 +1,14 @@
 package Handler;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
+import model.AuthData;
 import service.ClearService;
+import service.Service;
 import service.UserService;
 import spark.Request;
+
+import java.util.Set;
 
 public class Handler {
     protected final static ClearService clearService = new ClearService();
@@ -17,5 +22,14 @@ public class Handler {
 
     public <T> String toJson(T obj) {
         return serializer.toJson(obj);
+    }
+
+    public AuthData checkAuth(String authToken) throws DataAccessException {
+        AuthData authData = userService.authDao.getAuth(authToken);
+        if (authData!=null) {
+            return authData;
+        } else {
+            throw new DataAccessException("Error: unauthorized");
+        }
     }
 }

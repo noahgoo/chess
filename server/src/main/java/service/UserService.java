@@ -3,6 +3,7 @@ package service;
 import Request.*;
 import Result.*;
 import dataaccess.DataAccessException;
+import model.AuthData;
 import model.UserData;
 
 public class UserService extends Service {
@@ -12,8 +13,7 @@ public class UserService extends Service {
         if (userDao.getUser(userData)==null) {
             userDao.createUser(userData);
             String token = authDao.createAuth(userData.username());
-            RegisterResult registerResult = new RegisterResult(userData.username(), token);
-            return registerResult;
+            return new RegisterResult(userData.username(), token);
         } else {
             throw new DataAccessException("Error: already taken");
         }
@@ -28,5 +28,13 @@ public class UserService extends Service {
         // create new Auth
         String auth = authDao.createAuth(userData.username());
         return new LoginResult(userData.username(), auth);
+    }
+
+    public void logout(AuthData authData) throws DataAccessException {
+        try {
+            Service.authDao.deleteAuth(authData.authToken());
+        } catch (DataAccessException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 }
