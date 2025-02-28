@@ -1,9 +1,9 @@
-package Handler;
+package handler;
 
-import Request.*;
-import Result.CreateGameResult;
-import Result.ErrorResult;
-import Result.ListGameResult;
+import request.*;
+import result.CreateGameResult;
+import result.ErrorResult;
+import result.ListGameResult;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import spark.Request;

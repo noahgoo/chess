@@ -1,10 +1,7 @@
-package Handler;
+package handler;
 
-import Result.ErrorResult;
-import dataaccess.DataAccessException;
-import model.AuthData;
+import result.ErrorResult;
 import spark.*;
-import service.ClearService;
 
 public class ClearHandler extends Handler {
 

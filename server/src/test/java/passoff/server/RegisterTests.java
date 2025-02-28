@@ -1,7 +1,7 @@
 package passoff.server;
 
-import Request.RegisterRequest;
-import Result.RegisterResult;
+import request.RegisterRequest;
+import result.RegisterResult;
 import dataaccess.DataAccessException;
 import model.UserData;
 import org.junit.jupiter.api.Test;

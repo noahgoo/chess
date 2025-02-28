@@ -11,12 +11,4 @@ public class ClearTests {
         ClearService service = new ClearService();
         Assertions.assertTrue(service.clear());
     }
-
-//    @Test
-//    public void validResponse() {
-//        ClearHandler clearHandler = new ClearHandler();
-//        Response res = clearHandler.clear();
-//        Assertions.assertEquals();
-//    }
-
 }

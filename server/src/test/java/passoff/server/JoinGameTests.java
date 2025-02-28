@@ -1,15 +1,12 @@
 package passoff.server;
 
-import Request.CreateGameRequest;
-import Request.JoinGameRequest;
-import chess.ChessGame;
+import request.CreateGameRequest;
+import request.JoinGameRequest;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.Test;
 import service.GameService;
-
-import javax.xml.crypto.Data;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

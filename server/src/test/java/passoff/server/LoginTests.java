@@ -1,17 +1,11 @@
 package passoff.server;
 
-import Handler.UserHandler;
-import Request.LoginRequest;
-import Request.RegisterRequest;
-import Result.LoginResult;
-import com.google.gson.Gson;
+import request.LoginRequest;
+import request.RegisterRequest;
+import result.LoginResult;
 import dataaccess.DataAccessException;
-import model.UserData;
 import org.junit.jupiter.api.Test;
 import service.UserService;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

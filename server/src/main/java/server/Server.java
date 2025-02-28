@@ -1,8 +1,8 @@
 package server;
 
-import Handler.ClearHandler;
-import Handler.GameHandler;
-import Handler.UserHandler;
+import handler.ClearHandler;
+import handler.GameHandler;
+import handler.UserHandler;
 import spark.*;
 
 public class Server {

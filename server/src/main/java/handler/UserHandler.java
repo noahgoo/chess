@@ -1,7 +1,7 @@
-package Handler;
+package handler;
 
-import Result.*;
-import Request.*;
+import result.*;
+import request.*;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import spark.*;

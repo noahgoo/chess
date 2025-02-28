@@ -1,6 +1,5 @@
 package dataaccess;
 
-import Result.CreateGameResult;
 import model.AuthData;
 import model.GameData;
 

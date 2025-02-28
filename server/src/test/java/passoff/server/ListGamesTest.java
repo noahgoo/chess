@@ -1,8 +1,8 @@
 package passoff.server;
 
-import Request.CreateGameRequest;
-import Result.GameInfo;
-import Result.ListGameResult;
+import request.CreateGameRequest;
+import result.GameInfo;
+import result.ListGameResult;
 import dataaccess.DataAccessException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

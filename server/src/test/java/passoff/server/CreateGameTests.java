@@ -1,7 +1,7 @@
 package passoff.server;
 
-import Request.CreateGameRequest;
-import Result.CreateGameResult;
+import request.CreateGameRequest;
+import result.CreateGameResult;
 import dataaccess.DataAccessException;
 import org.junit.jupiter.api.Test;
 import service.GameService;
