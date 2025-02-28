@@ -4,24 +4,23 @@ import Result.*;
 import Request.*;
 import dataaccess.DataAccessException;
 import model.AuthData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import spark.*;
 
-import java.util.Set;
-
 public class UserHandler extends Handler {
-    // private static final Logger log = LoggerFactory.getLogger(UserHandler.class);
 
     public String register(Request request, Response response) {
         try {
             RegisterRequest registerRequest = createObj(request, RegisterRequest.class);
+            if (registerRequest.password()==null) {
+                response.status(400);
+                return toJson(new ErrorResult("Error: bad request"));
+            }
             RegisterResult registerResult = userService.register(registerRequest);
             response.status(200);
             return toJson(registerResult);
         } catch (DataAccessException e) {
             response.status(403);
-            return toJson(e.getMessage());
+            return toJson(new ErrorResult(e.getMessage()));
         }
 
     }
@@ -32,13 +31,12 @@ public class UserHandler extends Handler {
             LoginRequest loginRequest = createObj(request, LoginRequest.class);
             // perform login request
             LoginResult loginResult = userService.login(loginRequest);
-            var responseJson = toJson(loginResult);
             // response.body(responseJson);
             response.status(200);
-            return responseJson;
+            return toJson(loginResult);
         } catch (DataAccessException e) {
             response.status(401);
-            return toJson(e.getMessage());
+            return toJson(new ErrorResult(e.getMessage()));
         }
     }
 
@@ -51,7 +49,7 @@ public class UserHandler extends Handler {
             return "{}";
         } catch (DataAccessException e) {
             response.status(401);
-            return toJson(e.getMessage());
+            return toJson(new ErrorResult(e.getMessage()));
         }
 
     }
