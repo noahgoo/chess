@@ -29,10 +29,10 @@ public class JoinGameTests {
         AuthData authData = new AuthData("temp", "testUser");
         try {
             var gameResult = gameService.createGame(new CreateGameRequest("testGame"));
-            GameData newGame = gameService.gameDao.getGame(gameResult.gameID());
+            GameData newGame = Service.gameDao.getGame(gameResult.gameID());
             gameService.joinGame(joinGameRequest, authData);
             GameData expectedGame = new GameData(1, "testUser", null, "testGame", newGame.game());
-            GameData actualGame = gameService.gameDao.getGame(1);
+            GameData actualGame = Service.gameDao.getGame(1);
             assertEquals(expectedGame, actualGame);
         } catch (DataAccessException e) {
             e.printStackTrace();

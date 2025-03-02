@@ -8,7 +8,6 @@ import service.GameService;
 import service.Service;
 import service.UserService;
 import spark.Request;
-import spark.Response;
 
 public class Handler {
     protected final static ClearService clearService = new ClearService();

@@ -17,9 +17,7 @@ public class LoginTests {
 
         var loginRequest = new LoginRequest("testUser1", "testPassword");
         var loginService = new UserService();
-        DataAccessException e = assertThrows(DataAccessException.class, () -> {
-            loginService.login(loginRequest);
-        });
+        DataAccessException e = assertThrows(DataAccessException.class, () -> loginService.login(loginRequest));
 
         assertEquals("Error: unauthorized", e.getMessage());
 

@@ -13,10 +13,8 @@ public class LogoutTests {
     @Test
     public void logoutFail() {
         var userService = new UserService();
-        userService.authDao.createAuth("testUser");
-        DataAccessException e = assertThrows(DataAccessException.class, () -> {
-            userService.logout(new AuthData("wrongAuth", "testUser"));
-        });
+        Service.authDao.createAuth("testUser");
+        DataAccessException e = assertThrows(DataAccessException.class, () -> userService.logout(new AuthData("wrongAuth", "testUser")));
 
         assertEquals("Error: authToken doesn't exist", e.getMessage());
     }
@@ -24,12 +22,12 @@ public class LogoutTests {
     @Test
     public void logoutSuccess() {
         var userService = new UserService();
-        String auth = userService.authDao.createAuth("testUser");
+        String auth = Service.authDao.createAuth("testUser");
         try {
             userService.logout(new AuthData(auth, "testUser"));
         } catch (DataAccessException e) {
             e.printStackTrace();
         }
-        Assertions.assertEquals(userService.authDao.getAuth(auth),null);
+        Assertions.assertNull(Service.authDao.getAuth(auth));
     }
 }

@@ -25,7 +25,7 @@ public class CreateGameTests {
             var gameRequest = new CreateGameRequest("gameTest");
             var gameService = new GameService();
             var gameResponse = gameService.createGame(gameRequest);
-            assertEquals(gameResponse, new CreateGameResult(1));
+            assertEquals(new CreateGameResult(1), gameResponse);
         } catch (DataAccessException e) {
             e.printStackTrace();
         }

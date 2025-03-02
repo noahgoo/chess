@@ -30,7 +30,7 @@ public class ChessPiece implements Cloneable {
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
-        return (ChessPiece) super.clone();
+        return super.clone();
     }
 
     @Override
@@ -81,28 +81,14 @@ public class ChessPiece implements Cloneable {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         PieceType piece = board.getPiece(myPosition).getPieceType();
-        MovesCalculator calculator = null;
-        switch (piece) {
-            case BISHOP:
-                calculator = new BishopCalculator();
-                break;
-            case ROOK:
-                calculator = new RookCalculator();
-                break;
-            case QUEEN:
-                calculator = new QueenCalculator();
-                break;
-            case KNIGHT:
-                calculator = new KnightCalculator();
-                break;
-            case KING:
-                calculator = new KingCalculator();
-                break;
-            case PAWN:
-                calculator = new PawnCalculator();
-                break;
-        }
-        assert calculator != null;
+        MovesCalculator calculator = switch (piece) {
+            case BISHOP -> new BishopCalculator();
+            case ROOK -> new RookCalculator();
+            case QUEEN -> new QueenCalculator();
+            case KNIGHT -> new KnightCalculator();
+            case KING -> new KingCalculator();
+            case PAWN -> new PawnCalculator();
+        };
         return calculator.pieceMoves(board, myPosition);
 
     }
