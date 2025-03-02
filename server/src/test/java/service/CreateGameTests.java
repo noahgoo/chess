@@ -1,10 +1,9 @@
-package passoff.server;
+package service;
 
 import request.CreateGameRequest;
 import result.CreateGameResult;
 import dataaccess.DataAccessException;
 import org.junit.jupiter.api.Test;
-import service.GameService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

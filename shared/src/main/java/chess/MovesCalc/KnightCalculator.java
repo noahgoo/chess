@@ -7,9 +7,8 @@ import chess.ChessPosition;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-public class knightCalculator implements movesCalculator {
+public class KnightCalculator implements MovesCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
@@ -33,16 +32,5 @@ public class knightCalculator implements movesCalculator {
         return moves;
     }
 
-    public boolean checkSquare(ChessBoard board, ChessPosition position, ChessGame.TeamColor color) {
-        int row = position.getRow();
-        int col = position.getColumn();
-        if (row<9&&row>0&&col>0&&col<9) {
-            if (board.getPiece(position)==null) {
-                return true;
-            } else {
-                return board.getPiece(position).getTeamColor()!=color;
-            }
-        }
-        return false;
-    }
+
 }

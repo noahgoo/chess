@@ -5,8 +5,10 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import service.ClearService;
 import service.GameService;
+import service.Service;
 import service.UserService;
 import spark.Request;
+import spark.Response;
 
 public class Handler {
     protected final static ClearService clearService = new ClearService();
@@ -24,7 +26,7 @@ public class Handler {
     }
 
     public AuthData checkAuth(Request request) throws DataAccessException {
-        AuthData authData = userService.authDao.getAuth(request.headers("authorization"));
+        AuthData authData = Service.authDao.getAuth(request.headers("authorization"));
         if (authData!=null) {
             return authData;
         } else {

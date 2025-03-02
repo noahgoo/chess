@@ -1,4 +1,4 @@
-package passoff.server;
+package service;
 
 import request.CreateGameRequest;
 import request.JoinGameRequest;
@@ -6,7 +6,6 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.Test;
-import service.GameService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

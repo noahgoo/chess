@@ -1,4 +1,4 @@
-package passoff.server;
+package service;
 
 import request.CreateGameRequest;
 import result.GameInfo;
@@ -6,7 +6,6 @@ import result.ListGameResult;
 import dataaccess.DataAccessException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import service.GameService;
 
 import java.util.ArrayList;
 import java.util.List;

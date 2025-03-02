@@ -4,16 +4,14 @@ import chess.ChessBoard;
 import chess.ChessMove;
 import chess.ChessPosition;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-public class queenCalculator implements movesCalculator {
+public class QueenCalculator implements MovesCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves;
-        movesCalculator calc = new bishopCalculator();
-        movesCalculator calc2 = new rookCalculator();
+        MovesCalculator calc = new BishopCalculator();
+        MovesCalculator calc2 = new RookCalculator();
         moves = calc.pieceMoves(board, myPosition);
         moves.addAll(calc2.pieceMoves(board, myPosition));
         return moves;
