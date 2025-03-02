@@ -15,7 +15,7 @@ public class JoinGameTests {
     @Test
     public void joinGameFail() {
         var gameService = new GameService();
-        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", 1);
+        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", 4);
         AuthData authData = new AuthData("temp", "testUser");
         DataAccessException e = assertThrows(DataAccessException.class, () -> gameService.joinGame(joinGameRequest, authData));
 

@@ -21,11 +21,15 @@ public class GameService extends Service {
 
     public ListGameResult listGames() throws DataAccessException {
         List<GameData> gamesList = gameDao.listGames();
-        List<GameInfo> gameInfoList = new ArrayList<>();
-        for (GameData gameInfo: gamesList) {
-            gameInfoList.add(new GameInfo(gameInfo.gameID(), gameInfo.whiteUsername(), gameInfo.blackUsername(), gameInfo.gameName()));
+        if (gamesList.isEmpty()) {
+            throw new DataAccessException("Error: no current games");
+        } else {
+            List<GameInfo> gameInfoList = new ArrayList<>();
+            for (GameData gameInfo: gamesList) {
+                gameInfoList.add(new GameInfo(gameInfo.gameID(), gameInfo.whiteUsername(), gameInfo.blackUsername(), gameInfo.gameName()));
+            }
+            return new ListGameResult(gameInfoList);
         }
-        return new ListGameResult(gameInfoList);
     }
 
     public void joinGame(JoinGameRequest joinGameRequest, AuthData authData) throws DataAccessException {
