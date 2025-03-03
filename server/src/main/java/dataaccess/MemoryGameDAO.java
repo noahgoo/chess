@@ -49,11 +49,13 @@ public class MemoryGameDAO implements GameDAO {
     public void updateGame(String playerColor, GameData game, AuthData authData) throws DataAccessException{
         GameData currentGame = GAME_MAP.get(String.valueOf(game.gameID()));
         if (playerColor.equals("WHITE")&&game.whiteUsername()==null) {
-            GameData updatedGame = new GameData(currentGame.gameID(), authData.username(), currentGame.blackUsername(), currentGame.gameName(), currentGame.game());
+            GameData updatedGame = new GameData(currentGame.gameID(), authData.username(),
+                    currentGame.blackUsername(), currentGame.gameName(), currentGame.game());
             GAME_MAP.remove(String.valueOf(game.gameID()));
             GAME_MAP.put(String.valueOf(game.gameID()), updatedGame);
         } else if (playerColor.equals("BLACK")&&game.blackUsername()==null) {
-            GameData updatedGame = new GameData(currentGame.gameID(), currentGame.whiteUsername(), authData.username(), currentGame.gameName(), currentGame.game());
+            GameData updatedGame = new GameData(currentGame.gameID(), currentGame.whiteUsername(),
+                    authData.username(), currentGame.gameName(), currentGame.game());
             GAME_MAP.remove(String.valueOf(game.gameID()));
             GAME_MAP.put(String.valueOf(game.gameID()), updatedGame);
         } else {

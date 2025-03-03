@@ -38,7 +38,8 @@ public class PawnCalculator implements MovesCalculator {
         Collection<ChessMove> moreMoves = new ArrayList<>();
         Collection<ChessMove> temp = new ArrayList<>();
         for (ChessMove place: moves) {
-            if ((color.equals(ChessGame.TeamColor.WHITE)&&place.getEndPosition().getRow()==8)||(color.equals(ChessGame.TeamColor.BLACK)&&place.getEndPosition().getRow()==1)) {
+            if ((color.equals(ChessGame.TeamColor.WHITE)&&place.getEndPosition().getRow()==8)
+                    ||(color.equals(ChessGame.TeamColor.BLACK)&&place.getEndPosition().getRow()==1)) {
                 ChessPosition end = place.getEndPosition();
                 moreMoves.add(new ChessMove(myPosition, end, ChessPiece.PieceType.QUEEN));
                 moreMoves.add(new ChessMove(myPosition, end, ChessPiece.PieceType.ROOK));
