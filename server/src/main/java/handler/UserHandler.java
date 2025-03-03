@@ -17,7 +17,7 @@ public class UserHandler extends Handler {
                 return toJson(new ErrorResult("Error: bad request"));
             }
 
-            RegisterResult registerResult = userService.register(registerRequest);
+            RegisterResult registerResult = USER_SERVICE.register(registerRequest);
             response.status(200);
             return toJson(registerResult);
         } catch (DataAccessException e) {
@@ -30,7 +30,7 @@ public class UserHandler extends Handler {
     public String login(Request request, Response response) {
         try {
             LoginRequest loginRequest = createObj(request, LoginRequest.class);
-            LoginResult loginResult = userService.login(loginRequest);
+            LoginResult loginResult = USER_SERVICE.login(loginRequest);
             response.status(200);
             return toJson(loginResult);
         } catch (DataAccessException e) {
@@ -42,7 +42,7 @@ public class UserHandler extends Handler {
     public String logout(Request request, Response response) {
         try {
             AuthData authData = checkAuth(request);
-            userService.logout(authData);
+            USER_SERVICE.logout(authData);
             response.status(200);
             return "{}";
         } catch (DataAccessException e) {

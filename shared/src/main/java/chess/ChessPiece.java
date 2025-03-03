@@ -2,7 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.Objects;
-import chess.MovesCalc.*;
+import chess.moves.*;
 
 /**
  * Represents a single chess piece

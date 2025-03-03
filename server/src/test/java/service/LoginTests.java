@@ -27,7 +27,7 @@ public class LoginTests {
     public void loginSuccess() throws DataAccessException {
         var loginRequest = new LoginRequest("testUser", "testPassword");
         var loginService = new UserService();
-        Service.userDao.clearUser();
+        Service.USER_DAO.clearUser();
         loginService.register(new RegisterRequest("testUser", "testPassword", "testEmail"));
 
         var actualLoginResponse = loginService.login(loginRequest);

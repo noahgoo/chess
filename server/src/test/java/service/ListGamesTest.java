@@ -4,24 +4,24 @@ import request.CreateGameRequest;
 import result.GameInfo;
 import result.ListGameResult;
 import dataaccess.DataAccessException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ListGamesTest {
 
     @Test
-    public void listGamesFail() {
+    public void listGamesEmpty() throws DataAccessException {
         var gameService = new GameService();
-        Service.gameDao.clearGame();
-        DataAccessException e = assertThrows(DataAccessException.class, gameService::listGames);
+        Service.GAME_DAO.clearGame();
+        var gameList = new ArrayList<GameInfo>();
+        ListGameResult actualResult = gameService.listGames();
+        ListGameResult expectedResult = new ListGameResult(gameList);
 
-        assertEquals("Error: no current games", e.getMessage());
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test

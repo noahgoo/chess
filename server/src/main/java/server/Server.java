@@ -6,9 +6,9 @@ import handler.UserHandler;
 import spark.*;
 
 public class Server {
-    private static final UserHandler userHandler = new UserHandler();
-    private static final GameHandler gameHandler = new GameHandler();
-    private static final ClearHandler clearHandler = new ClearHandler();
+    private static final UserHandler USER_HANDLER = new UserHandler();
+    private static final GameHandler GAME_HANDLER = new GameHandler();
+    private static final ClearHandler CLEAR_HANDLER = new ClearHandler();
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -28,14 +28,14 @@ public class Server {
     }
 
     private static void createRoutes() {
-        Spark.post("/session", userHandler::login);
-        Spark.post("/user" , userHandler::register);
-        Spark.delete("/session", userHandler::logout);
+        Spark.post("/session", USER_HANDLER::login);
+        Spark.post("/user" , USER_HANDLER::register);
+        Spark.delete("/session", USER_HANDLER::logout);
 
-        Spark.get("/game", gameHandler::listGames);
-        Spark.post("/game", gameHandler::createGame);
-        Spark.put("/game", gameHandler::joinGame);
+        Spark.get("/game", GAME_HANDLER::listGames);
+        Spark.post("/game", GAME_HANDLER::createGame);
+        Spark.put("/game", GAME_HANDLER::joinGame);
 
-        Spark.delete("/db", clearHandler::clear);
+        Spark.delete("/db", CLEAR_HANDLER::clear);
     }
 }

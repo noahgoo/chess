@@ -22,7 +22,7 @@ public class GameHandler extends Handler {
         }
         try {
             CreateGameRequest gameRequest = createObj(request, CreateGameRequest.class);
-            CreateGameResult newGameResult = gameService.createGame(gameRequest);
+            CreateGameResult newGameResult = GAME_SERVICE.createGame(gameRequest);
             return toJson(newGameResult);
         } catch (DataAccessException e) {
             response.status(500);
@@ -38,7 +38,7 @@ public class GameHandler extends Handler {
             return toJson(new ErrorResult(e.getMessage()));
         }
         try {
-            ListGameResult listGameResult = gameService.listGames();
+            ListGameResult listGameResult = GAME_SERVICE.listGames();
             return toJson(listGameResult);
         } catch (DataAccessException e) {
             response.status(500);
@@ -58,7 +58,7 @@ public class GameHandler extends Handler {
             JoinGameRequest joinGameRequest = createObj(request, JoinGameRequest.class);
             if ((joinGameRequest.playerColor()!=null&&joinGameRequest.gameID()!=0)&&
                     Objects.equals(joinGameRequest.playerColor(), "WHITE") || Objects.equals(joinGameRequest.playerColor(), "BLACK")) {
-                gameService.joinGame(joinGameRequest, authData);
+                GAME_SERVICE.joinGame(joinGameRequest, authData);
                 return "{}";
             } else {
                 response.status(400);

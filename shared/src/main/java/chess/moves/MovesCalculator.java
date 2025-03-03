@@ -1,25 +1,31 @@
-package chess.MovesCalc;
+package chess.moves;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class BishopCalculator implements MovesCalculator {
+public interface MovesCalculator {
+    Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition);
 
-    @Override
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> moves = helper(board, myPosition, 1, 1);
-        moves.addAll(helper(board, myPosition, -1, 1));
-        moves.addAll(helper(board, myPosition, 1, -1));
-        moves.addAll(helper(board, myPosition, -1, -1));
-        return moves;
+    default boolean checkSquare(ChessBoard board, ChessPosition position, ChessGame.TeamColor color) {
+        int row = position.getRow();
+        int col = position.getColumn();
+        if (row<9&&row>0&&col>0&&col<9) {
+            if (board.getPiece(position)==null) {
+                return true;
+            } else {
+                return board.getPiece(position).getTeamColor()!=color;
+            }
+        }
+        return false;
+
     }
 
-
-    private Collection<ChessMove> helper(ChessBoard board, ChessPosition myPosition, int r, int c) {
+    default Collection<ChessMove> fourDirectionHelper(ChessBoard board, ChessPosition myPosition, int r, int c) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
         Collection<ChessMove> directionMoves = new ArrayList<>();

@@ -15,7 +15,7 @@ public class RegisterTests {
     public void registerFail() {
         RegisterRequest registerRequest = new RegisterRequest("testUser", "testPassword", "testEmail");
         UserService userService = new UserService();
-        Service.userDao.createUser(new UserData("testUser", "testPassword", "testEmail"));
+        Service.USER_DAO.createUser(new UserData("testUser", "testPassword", "testEmail"));
         DataAccessException e = assertThrows(DataAccessException.class, () -> userService.register(registerRequest));
 
         assertEquals("Error: already taken", e.getMessage());

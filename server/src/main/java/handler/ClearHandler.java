@@ -7,7 +7,7 @@ public class ClearHandler extends Handler {
 
 
     public String clear(Request request, Response response) {
-        if (clearService.clear()) {
+        if (CLEAR_SERVICE.clear()) {
             response.status(200);
         } else {
             response.status(500);
