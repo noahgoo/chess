@@ -4,6 +4,9 @@ import model.AuthData;
 
 public class SQLAuthDAO implements AuthDAO {
 
+    public SQLAuthDAO() {
+    }
+
     @Override
     public String createAuth(String username) {
         return "";

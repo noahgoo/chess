@@ -1,5 +1,6 @@
 package server;
 
+import dataaccess.DatabaseManager;
 import handler.ClearHandler;
 import handler.GameHandler;
 import handler.UserHandler;
