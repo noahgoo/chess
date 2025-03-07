@@ -12,7 +12,7 @@ public class AuthDAOTests {
     SQLAuthDAO SQL_DAO = new SQLAuthDAO();
 
     @Test
-    public void getAuthFail() {
+    public void getAuthFail() throws DataAccessException {
         SQL_DAO.clearAuth();
         SQL_DAO.createAuth("getAuthUser");
         AuthData actual = SQL_DAO.getAuth("wrong auth");
@@ -20,7 +20,7 @@ public class AuthDAOTests {
     }
 
     @Test
-    public void getAuthSuccess() {
+    public void getAuthSuccess() throws DataAccessException {
         SQL_DAO.clearAuth();
         String authToken = SQL_DAO.createAuth("getAuthUser");
         AuthData actual = SQL_DAO.getAuth(authToken);
@@ -29,7 +29,7 @@ public class AuthDAOTests {
     }
 
     @Test
-    public void deleteAuthFail() {
+    public void deleteAuthFail() throws DataAccessException {
         SQL_DAO.clearAuth();
         SQL_DAO.createAuth("deleteAuthUser");
         DataAccessException e = assertThrows(DataAccessException.class, () -> SQL_DAO.deleteAuth("wrong auth"));
@@ -53,11 +53,10 @@ public class AuthDAOTests {
     }
 
     @Test
-    public void createAuthFail() {
+    public void createAuthFail() throws DataAccessException {
         SQL_DAO.clearAuth();
-        String authToken1 = SQL_DAO.createAuth("createAuthUser");
-        String authToken2 = SQL_DAO.createAuth("createAuthUser");
-        Assertions.assertNotEquals(authToken1, authToken2);
+        DataAccessException e = assertThrows(DataAccessException.class, () -> SQL_DAO.createAuth(null));
+        Assertions.assertNotEquals("Error: unable to access database", e.getMessage());
     }
 
     @Test

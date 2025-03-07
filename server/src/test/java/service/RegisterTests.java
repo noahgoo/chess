@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class RegisterTests {
 
     @Test
-    public void registerFail() {
+    public void registerFail() throws DataAccessException {
         RegisterRequest registerRequest = new RegisterRequest("testUser", "testPassword", "testEmail");
         UserService userService = new UserService();
         Service.USER_DAO.createUser(new UserData("testUser", "testPassword", "testEmail"));

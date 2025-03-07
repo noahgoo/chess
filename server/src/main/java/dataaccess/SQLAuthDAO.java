@@ -25,7 +25,7 @@ public class SQLAuthDAO extends DAO implements AuthDAO {
 
 
     @Override
-    public String createAuth(String username) {
+    public String createAuth(String username) throws DataAccessException {
         String statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
         String token = UUID.randomUUID().toString();
         executeUpdate(statement, token, username);
@@ -67,7 +67,7 @@ public class SQLAuthDAO extends DAO implements AuthDAO {
     }
 
     @Override
-    public void clearAuth() {
+    public void clearAuth() throws DataAccessException {
         String statement = "TRUNCATE auth";
         executeUpdate(statement);
     }

@@ -15,11 +15,11 @@ public class DAO {
         }
     }
 
-    public void configureDB(String[] authStatements) {
+    public void configureDB(String[] statements) {
         try {
 
             try (var connection = DatabaseManager.getConnection()) {
-                for (var statement: authStatements) {
+                for (var statement: statements) {
                     try (var preparedStatement = connection.prepareStatement(statement)) {
                         preparedStatement.executeUpdate();
                     }
@@ -30,7 +30,7 @@ public class DAO {
         }
     }
 
-    public int executeUpdate(String statement, Object... params) {
+    public int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var connection = DatabaseManager.getConnection()) {
             try (var preparedStatement = connection.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
@@ -53,7 +53,7 @@ public class DAO {
                 return 0;
             }
         } catch (SQLException | DataAccessException e) {
-            return 0;
+            throw new DataAccessException("Error: unable to update database");
         }
     }
 }
