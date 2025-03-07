@@ -5,7 +5,25 @@ import model.GameData;
 
 import java.util.List;
 
-public class SQLGameDAO implements GameDAO {
+public class SQLGameDAO extends DAO implements GameDAO {
+
+    private final String[] gameStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS game (
+                gameID INT NOT NULL,
+                whiteUsername VARCHAR(255),
+                blackUsername VARCHAR(255),
+                gameName VARCHAR(255) NOT NULL,
+                game JSON NOT NULL,
+                PRIMARY KEY (gameID)
+            );
+            """
+    };
+
+    public SQLGameDAO() {
+        configureDB(gameStatements);
+    }
+
     @Override
     public int createGame(String gameName) throws DataAccessException {
         return 0;
