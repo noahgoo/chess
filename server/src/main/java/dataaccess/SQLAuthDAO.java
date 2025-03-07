@@ -37,7 +37,7 @@ public class SQLAuthDAO extends DAO implements AuthDAO {
         String statement = "SELECT username FROM auth WHERE authToken=?";
         try (var connection = DatabaseManager.getConnection()) {
             try (var preparedStatement = connection.prepareStatement(statement)) {
-                preparedStatement.setString(0, authToken);
+                preparedStatement.setString(1, authToken);
                 try (var response = preparedStatement.executeQuery()) {
                     if (response.next()) {
                         return new AuthData(authToken, response.getString("username"));

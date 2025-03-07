@@ -7,9 +7,17 @@ import static java.sql.Types.NULL;
 
 public class DAO {
 
-    public void configureDB(String[] authStatements) {
+    public DAO() {
         try {
             DatabaseManager.createDatabase();
+        } catch (DataAccessException e) {
+            // deal with error
+        }
+    }
+
+    public void configureDB(String[] authStatements) {
+        try {
+
             try (var connection = DatabaseManager.getConnection()) {
                 for (var statement: authStatements) {
                     try (var preparedStatement = connection.prepareStatement(statement)) {
@@ -41,7 +49,6 @@ public class DAO {
                 var response = preparedStatement.getGeneratedKeys();
                 if (response.next()) {
                     return response.getInt(1);
-
                 }
                 return 0;
             }
