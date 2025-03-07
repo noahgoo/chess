@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class AuthDAOTests {
     SQLAuthDAO SQL_DAO = new SQLAuthDAO();
 
@@ -27,17 +29,18 @@ public class AuthDAOTests {
     }
 
     @Test
-    public void deleteAuthFail() {}
+    public void deleteAuthFail() {
+        SQL_DAO.clearAuth();
+        SQL_DAO.createAuth("deleteAuthUser");
+        DataAccessException e = assertThrows(DataAccessException.class, () -> SQL_DAO.deleteAuth("wrong auth"));
+        Assertions.assertEquals("Error: authToken doesn't exist", e.getMessage());
+    }
 
     @Test
     public void deleteAuthSuccess() throws DataAccessException {
         SQL_DAO.clearAuth();
         String authToken = SQL_DAO.createAuth("deleteAuthUser");
-        try {
-            SQL_DAO.deleteAuth(authToken);
-        } catch (DataAccessException e) {
-            throw new DataAccessException("Error: no authToken");
-        }
+        SQL_DAO.deleteAuth(authToken);
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement("SELECT authToken FROM auth WHERE username=?")) {
                 ps.setString(1, "deleteAuthUser");
@@ -50,7 +53,12 @@ public class AuthDAOTests {
     }
 
     @Test
-    public void createAuthFail() {}
+    public void createAuthFail() {
+        SQL_DAO.clearAuth();
+        String authToken1 = SQL_DAO.createAuth("createAuthUser");
+        String authToken2 = SQL_DAO.createAuth("createAuthUser");
+        Assertions.assertNotEquals(authToken1, authToken2);
+    }
 
     @Test
     public void createAuthSuccess() throws DataAccessException {

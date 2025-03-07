@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class LogoutTests {
 
     @Test
-    public void logoutFail() {
+    public void logoutFail() throws DataAccessException {
         var userService = new UserService();
         Service.AUTH_DAO.createAuth("testUser");
         DataAccessException e = assertThrows(DataAccessException.class, () -> userService.logout(new AuthData("wrongAuth", "testUser")));
@@ -20,7 +20,7 @@ public class LogoutTests {
     }
 
     @Test
-    public void logoutSuccess() {
+    public void logoutSuccess() throws DataAccessException {
         var userService = new UserService();
         String auth = Service.AUTH_DAO.createAuth("testUser");
         try {

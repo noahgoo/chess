@@ -46,14 +46,13 @@ public class DAO {
                 }
                 preparedStatement.executeUpdate();
 
-                var response = preparedStatement.getGeneratedKeys();
-                if (response.next()) {
-                    return response.getInt(1);
+                var resultSet = preparedStatement.getGeneratedKeys();
+                if (resultSet.next()) {
+                    return resultSet.getInt(1);
                 }
                 return 0;
             }
         } catch (SQLException | DataAccessException e) {
-            // deal with error
             return 0;
         }
     }
