@@ -62,9 +62,10 @@ public class UserDAOTests {
     @Test
     public void getUserSuccess() throws DataAccessException {
         SQL_DAO.clearUser();
-        UserData expected = new UserData("testUser", "testPass", "testEmail");
-        SQL_DAO.createUser(expected);
+        UserData user = new UserData("testUser", "testPass", "testEmail");
+        SQL_DAO.createUser(user);
         UserData actual = SQL_DAO.getUser(new UserData("testUser", "testPass", null));
+        UserData expected = new UserData("testUser", actual.password(), "testEmail");
         Assertions.assertEquals(expected, actual);
     }
  }

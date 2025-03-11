@@ -9,6 +9,7 @@ import model.UserData;
 public class UserService extends Service {
 
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
+        // String hashedPass = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
         UserData userData = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
         if (USER_DAO.getUser(userData)==null) {
             USER_DAO.createUser(userData);
@@ -20,6 +21,7 @@ public class UserService extends Service {
     }
 
     public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
+        // String hashedPass = BCrypt.hashpw(loginRequest.password(), BCrypt.gensalt());
         UserData userData = new UserData(loginRequest.username(), loginRequest.password(), null);
 
         if (USER_DAO.getUser(userData)==null) {
