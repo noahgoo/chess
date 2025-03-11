@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Test;
 import java.sql.SQLException;
 
 public class UserDAOTests {
-    SQLUserDAO SQL_DAO = new SQLUserDAO();
+    SQLUserDAO sqlUserDAO = new SQLUserDAO();
 
     @Test
     public void clearUser() throws DataAccessException {
-        SQL_DAO.createUser(new UserData("testUser", "testPass", null));
-        SQL_DAO.clearUser();
+        sqlUserDAO.createUser(new UserData("testUser", "testPass", null));
+        sqlUserDAO.clearUser();
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement("SELECT * FROM user")) {
                 var rs = ps.executeQuery();
@@ -25,16 +25,16 @@ public class UserDAOTests {
 
     @Test
     public void createUserFail() throws DataAccessException {
-        SQL_DAO.clearUser();
+        sqlUserDAO.clearUser();
         DataAccessException e = Assertions.assertThrows(DataAccessException.class, () ->
-                SQL_DAO.createUser(new UserData(null, "testPass", null)));
+                sqlUserDAO.createUser(new UserData(null, "testPass", null)));
         Assertions.assertEquals("Error: unable to update database", e.getMessage());
     }
 
     @Test
     public void createUserSuccess() throws DataAccessException {
-        SQL_DAO.clearUser();
-        SQL_DAO.createUser(new UserData("testUser", "testPass", "testEmail"));
+        sqlUserDAO.clearUser();
+        sqlUserDAO.createUser(new UserData("testUser", "testPass", "testEmail"));
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement("SELECT username FROM user WHERE email=?")) {
                 ps.setString(1, "testEmail");
@@ -54,17 +54,17 @@ public class UserDAOTests {
 
     @Test
     public void getUserFail() throws DataAccessException {
-        SQL_DAO.clearUser();
-        var actual = SQL_DAO.getUser(new UserData("testUser", "testPass", "testEmail"));
+        sqlUserDAO.clearUser();
+        var actual = sqlUserDAO.getUser(new UserData("testUser", "testPass", "testEmail"));
         Assertions.assertNull(actual);
     }
 
     @Test
     public void getUserSuccess() throws DataAccessException {
-        SQL_DAO.clearUser();
+        sqlUserDAO.clearUser();
         UserData user = new UserData("testUser", "testPass", "testEmail");
-        SQL_DAO.createUser(user);
-        UserData actual = SQL_DAO.getUser(new UserData("testUser", "testPass", null));
+        sqlUserDAO.createUser(user);
+        UserData actual = sqlUserDAO.getUser(new UserData("testUser", "testPass", null));
         UserData expected = new UserData("testUser", actual.password(), "testEmail");
         Assertions.assertEquals(expected, actual);
     }

@@ -10,10 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SQLGameDAO extends DAO implements GameDAO {
-    private static int GAME_IDS = 0;
+    private static int gameIds = 0;
 
-    private final String[] gameStatements = {
-            """
+    public SQLGameDAO() {
+        String[] gameStatements = {
+                """
             CREATE TABLE IF NOT EXISTS game (
                 gameID INT NOT NULL,
                 whiteUsername VARCHAR(255),
@@ -23,9 +24,7 @@ public class SQLGameDAO extends DAO implements GameDAO {
                 PRIMARY KEY (gameID)
             );
             """
-    };
-
-    public SQLGameDAO() {
+        };
         configureDB(gameStatements);
     }
 
@@ -34,9 +33,9 @@ public class SQLGameDAO extends DAO implements GameDAO {
         String statement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
         ChessGame newChessGame = new ChessGame();
         var jsonChess = new Gson().toJson(newChessGame);
-        GAME_IDS += 1;
-        executeUpdate(statement, GAME_IDS, null, null, gameName, jsonChess);
-        return GAME_IDS;
+        gameIds += 1;
+        executeUpdate(statement, gameIds, null, null, gameName, jsonChess);
+        return gameIds;
     }
 
     @Override
@@ -60,9 +59,8 @@ public class SQLGameDAO extends DAO implements GameDAO {
             }
             return gameDataList;
         } catch (DataAccessException | SQLException e) {
-            // error??
+            return List.of();
         }
-        return List.of();
     }
 
     @Override

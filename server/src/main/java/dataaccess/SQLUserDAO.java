@@ -7,8 +7,9 @@ import java.sql.SQLException;
 
 public class SQLUserDAO extends DAO implements UserDAO {
 
-    private final String[] userStatements = {
-            """
+    public SQLUserDAO() {
+        String[] userStatements = {
+                """
             CREATE TABLE IF NOT EXISTS user (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 username VARCHAR(255) NOT NULL,
@@ -16,9 +17,7 @@ public class SQLUserDAO extends DAO implements UserDAO {
                 email VARCHAR(255)
             );
             """
-    };
-
-    public SQLUserDAO() {
+        };
         configureDB(userStatements);
     }
 
@@ -35,7 +34,6 @@ public class SQLUserDAO extends DAO implements UserDAO {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, user.username());
-                // ps.setString(2, user.password());
                 var rs = ps.executeQuery();
                 if (rs.next()) {
                     if (BCrypt.checkpw(user.password(), rs.getString("password"))) {

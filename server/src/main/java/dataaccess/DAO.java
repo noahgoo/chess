@@ -1,6 +1,5 @@
 package dataaccess;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -12,7 +11,7 @@ public class DAO {
         try {
             DatabaseManager.createDatabase();
         } catch (DataAccessException e) {
-            // deal with error
+            e.printStackTrace();
         }
     }
 
@@ -40,9 +39,7 @@ public class DAO {
                         case String p -> preparedStatement.setString(i + 1, p);
                         case Integer p -> preparedStatement.setInt(i + 1, p);
                         case null -> preparedStatement.setNull(i + 1, NULL);
-                        default -> {
-                            // default??
-                        }
+                        default -> throw new DataAccessException("Unexpected value: " + param);
                     }
                 }
                 preparedStatement.executeUpdate();
@@ -55,25 +52,6 @@ public class DAO {
             }
         } catch (SQLException | DataAccessException e) {
             throw new DataAccessException("Error: unable to update database");
-        }
-    }
-
-    public ResultSet executeQuery(String statement, Object... params) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement)) {
-                for (int i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    switch (param) {
-                        case String p -> ps.setString(i + 1, p);
-                        case Integer p -> ps.setInt(i + 1, p);
-                        case null -> ps.setNull(i + 1, NULL);
-                            default -> throw new DataAccessException("Unexpected value: " + param);
-                    }
-                }
-                return ps.executeQuery();
-            }
-        } catch (DataAccessException | SQLException e) {
-            throw new DataAccessException("Error: unable to query database");
         }
     }
 }
