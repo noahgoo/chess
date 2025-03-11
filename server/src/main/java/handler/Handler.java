@@ -3,6 +3,7 @@ package handler;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import model.AuthData;
+import request.RegisterRequest;
 import service.ClearService;
 import service.GameService;
 import service.Service;
