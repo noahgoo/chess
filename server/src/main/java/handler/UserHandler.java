@@ -1,9 +1,12 @@
 package handler;
 
-import result.*;
-import request.*;
 import dataaccess.DataAccessException;
 import model.AuthData;
+import request.LoginRequest;
+import request.RegisterRequest;
+import result.ErrorResult;
+import result.LoginResult;
+import result.RegisterResult;
 import spark.*;
 
 public class UserHandler extends Handler {

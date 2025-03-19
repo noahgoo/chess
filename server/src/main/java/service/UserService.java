@@ -1,10 +1,12 @@
 package service;
 
-import request.*;
-import result.*;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
+import request.LoginRequest;
+import request.RegisterRequest;
+import result.LoginResult;
+import result.RegisterResult;
 
 public class UserService extends Service {
 

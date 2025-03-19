@@ -1,6 +1,7 @@
 package handler;
 
-import request.*;
+import request.CreateGameRequest;
+import request.JoinGameRequest;
 import result.CreateGameResult;
 import result.ErrorResult;
 import result.ListGameResult;
