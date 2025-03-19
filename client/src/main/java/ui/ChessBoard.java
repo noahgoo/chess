@@ -20,42 +20,28 @@ public class ChessBoard {
         board.resetBoard();
         board.addPiece(new ChessPosition(4,4),new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING));
         board.addPiece(new ChessPosition(5,1),new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN));
-        drawChessBoardNormal(board);
-        drawChessBoardFlipped(board);
+        drawChessBoard(board, false);
+        drawChessBoard(board, true);
     }
 
-    public static void drawChessBoardNormal(chess.ChessBoard board) {
+    public static void drawChessBoard(chess.ChessBoard board, boolean flip) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        FLIP = false;
+        FLIP = flip;
         out.print(ERASE_SCREEN);
 
-        drawHeaders(out, FLIP);
+        drawHeaders(out);
         drawBoard(out, board);
-        drawHeaders(out, FLIP);
+        drawHeaders(out);
 
         out.println();
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_WHITE);
     }
 
-    public static void drawChessBoardFlipped(chess.ChessBoard board) {
-        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        FLIP = true;
-        out.print(ERASE_SCREEN);
-
-        drawHeaders(out, FLIP);
-        drawBoard(out, board);
-        drawHeaders(out, FLIP);
-
-        out.println();
-        out.print(SET_BG_COLOR_BLACK);
-        out.print(SET_TEXT_COLOR_WHITE);
-    }
-
-    private static void drawHeaders(PrintStream out, boolean flip) {
+    private static void drawHeaders(PrintStream out) {
         setGray(out);
         String[] headers = { " a ", " b ", " c ", " d ", " e ", " f ", " g ", " h " };
-        if (flip) {
+        if (FLIP) {
             headers = new String[]{" h ", " g ", " f ", " e ", " d ", " c ", " b ", " a "};
         }
 
@@ -74,12 +60,10 @@ public class ChessBoard {
         out.print(SET_TEXT_COLOR_BLACK);
 
         out.print(player);
-
         setGray(out);
     }
 
     private static void drawBoard(PrintStream out, chess.ChessBoard board) {
-
         if (FLIP) {
             for (int boardRow = 1; boardRow < 9; ++boardRow) {
                 drawRowOfSquares(out, boardRow, board);
@@ -92,9 +76,7 @@ public class ChessBoard {
     }
 
     private static void drawRowOfSquares(PrintStream out, int rowNumber, chess.ChessBoard board) {
-        // draw the edge piece
         drawEdgeSquare(out, rowNumber);
-
         boolean flag = rowNumber % 2 > 0;
 
         for (int col = 0; col < BOARD_SIZE_IN_SQUARES; ++col) {
@@ -126,9 +108,7 @@ public class ChessBoard {
         }
 
         drawEdgeSquare(out, rowNumber);
-
         setBlack(out);
-
         out.println();
     }
 
@@ -151,7 +131,6 @@ public class ChessBoard {
             };
         }
         return null;
-
     }
 
     private static String determineColor(chess.ChessBoard board, ChessPosition position) {
@@ -187,7 +166,7 @@ public class ChessBoard {
     }
 
     private static void setBlack(PrintStream out) {
-        out.print(SET_BG_COLOR_BLACK);
+        out.print(SET_BG_COLOR_DARK_GREY);
         out.print(SET_TEXT_COLOR_BLACK);
     }
 
