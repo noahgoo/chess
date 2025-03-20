@@ -2,8 +2,10 @@ package ui;
 
 import exception.ResponseException;
 import net.ServerFacade;
+import request.CreateGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
+import result.CreateGameResult;
 import result.LoginResult;
 import result.RegisterResult;
 
@@ -127,6 +129,12 @@ public class Client {
         return null;
     }
 
+    private static CreateGameRequest getCreateRequest(PrintStream out, Scanner scanner) {
+        out.println("Please provide a <GAMENAME>");
+        out.print(">> ");
+        return new CreateGameRequest(scanner.nextLine());
+    }
+
     private static void displayPostLogin(PrintStream out, Scanner scanner) {
         while (true) {
             out.println("[Logged In]");
@@ -154,7 +162,13 @@ public class Client {
 
             switch (response) {
                 case "1":
-                    // create game
+                    CreateGameRequest createGameRequest = getCreateRequest(out, scanner);
+                    try {
+                        CreateGameResult gameResult = SERVER_FACADE.createGame(createGameRequest, AUTH_TOKEN);
+                        out.println("Successfully created game with ID " + gameResult.gameID() + "\n");
+                    } catch (ResponseException e) {
+                        out.println("Error: could not create new game");
+                    }
                     break;
                 case "2":
                     // list games

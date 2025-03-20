@@ -5,6 +5,7 @@ import exception.ResponseException;
 import request.CreateGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
+import result.CreateGameResult;
 import result.LoginResult;
 import result.RegisterResult;
 
@@ -22,12 +23,12 @@ public class ServerFacade {
 
     public RegisterResult register(RegisterRequest registerRequest) throws ResponseException {
         var path = serverUrl + "/user";
-        return CLIENT.doPost(path, registerRequest, RegisterResult.class);
+        return CLIENT.doPost(path, registerRequest, RegisterResult.class, null);
 
     }
     public LoginResult login(LoginRequest loginRequest) throws ResponseException {
         var path = serverUrl + "/session";
-        return CLIENT.doPost(path, loginRequest, LoginResult.class);
+        return CLIENT.doPost(path, loginRequest, LoginResult.class, null);
     }
 
     public void logout(String authToken) throws ResponseException {
@@ -35,7 +36,8 @@ public class ServerFacade {
         CLIENT.doDelete(path, authToken);
     }
 
-    public void createGame(CreateGameRequest createGameRequest) {
-
+    public CreateGameResult createGame(CreateGameRequest createGameRequest, String authToken) throws ResponseException {
+        var path = serverUrl + "/game";
+        return CLIENT.doPost(path, createGameRequest, CreateGameResult.class, authToken);
     }
 }

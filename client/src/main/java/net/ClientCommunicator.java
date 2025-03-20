@@ -14,16 +14,21 @@ import java.net.URL;
 // communicates with server based on get and post
 public class ClientCommunicator {
 
-    public <T> T doPost(String urlString, Object request, Class<T> responseClass) throws ResponseException {
+    public <T> T doPost(String urlString, Object request, Class<T> responseClass, String authToken) throws ResponseException {
+        HttpURLConnection connection = null;
         try {
             URL url = new URL(urlString);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection = (HttpURLConnection) url.openConnection();
 
             connection.setReadTimeout(5000);
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
 
+            if (authToken!=null) {
+                connection.addRequestProperty("authorization", authToken);
+            }
             writeBody(request, connection);
+
             connection.connect();
 
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
@@ -40,6 +45,10 @@ public class ClientCommunicator {
             throw ex;
         } catch (Exception e) {
             throw new ResponseException(500, e.getMessage());
+        } finally {
+            if (connection!=null) {
+                connection.disconnect();
+            }
         }
     }
 
@@ -85,6 +94,5 @@ public class ClientCommunicator {
         }
         return response;
     }
-
 
 }
