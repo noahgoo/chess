@@ -2,6 +2,7 @@ package net;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import request.CreateGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
 import result.LoginResult;
@@ -27,5 +28,14 @@ public class ServerFacade {
     public LoginResult login(LoginRequest loginRequest) throws ResponseException {
         var path = serverUrl + "/session";
         return CLIENT.doPost(path, loginRequest, LoginResult.class);
+    }
+
+    public void logout(String authToken) throws ResponseException {
+        var path = serverUrl + "/session";
+        CLIENT.doDelete(path, authToken);
+    }
+
+    public void createGame(CreateGameRequest createGameRequest) {
+
     }
 }

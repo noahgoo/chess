@@ -16,6 +16,8 @@ import java.util.Scanner;
 // has the menu
 public class Client {
     static boolean QUIT = false;
+    static String AUTH_TOKEN;
+    static ServerFacade SERVER_FACADE;
 
     public static void main(String[] args) {
 //        var serverUrl = "http://localhost:8080";
@@ -24,14 +26,13 @@ public class Client {
 //        }
 //
 //        new Server(serverUrl).run();
-
+        SERVER_FACADE = new ServerFacade("http://localhost:8080");
         displayPreLogin();
     }
 
     private static void displayPreLogin() {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         Scanner scanner = new Scanner(System.in);
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
         // display pre login menu
         while (true) {
             out.println("[Logged Out]");
@@ -63,8 +64,9 @@ public class Client {
                         break;
                     }
                     try {
-                        RegisterResult registerResult = serverFacade.register(registerRequest);
+                        RegisterResult registerResult = SERVER_FACADE.register(registerRequest);
                         out.println("Logged in as " + registerResult.username() + "\n");
+                        AUTH_TOKEN = registerResult.authToken();
                         displayPostLogin(out, scanner);
                     } catch (ResponseException e) {
                         out.println("Error: could not process Register request\n");
@@ -78,8 +80,9 @@ public class Client {
                         break;
                     }
                     try {
-                        LoginResult loginResult = serverFacade.login(loginRequest);
+                        LoginResult loginResult = SERVER_FACADE.login(loginRequest);
                         out.println("Logged in as " + loginResult.username() + "\n");
+                        AUTH_TOKEN = loginResult.authToken();
                         displayPostLogin(out, scanner);
                     } catch (ResponseException e) {
                         out.println("Error: could not process Login request\n");
@@ -137,6 +140,17 @@ public class Client {
             out.print(">> ");
 
             String response = scanner.next();
+            if (scanner.hasNextLine()) {
+                scanner.nextLine();
+            }
+            String[] validResponses = {"1", "2", "3", "4"};
+            while (!Arrays.asList(validResponses).contains(response)) {
+                out.print("Not a valid option, please try again: ");
+                response = scanner.next();
+                if (scanner.hasNextLine()) {
+                    scanner.nextLine();
+                }
+            }
 
             switch (response) {
                 case "1":
@@ -152,7 +166,13 @@ public class Client {
                     // observe game
                     break;
                 case "5":
-                    // logout
+                    try {
+                        SERVER_FACADE.logout(AUTH_TOKEN);
+                        displayPreLogin();
+                    } catch (ResponseException e) {
+                        out.println(e.getMessage());
+                        break;
+                    }
                     break;
                 case "6":
                     // help

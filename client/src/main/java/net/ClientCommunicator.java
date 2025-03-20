@@ -43,6 +43,28 @@ public class ClientCommunicator {
         }
     }
 
+    public void doDelete(String urlString, String authToken) throws ResponseException {
+        try {
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            connection.setReadTimeout(5000);
+            connection.setRequestMethod("DELETE");
+            connection.setDoOutput(true);
+
+            if (authToken!=null) {
+                connection.addRequestProperty("authorization", authToken);
+            }
+            connection.connect();
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                throw new ResponseException(401, "Error: unauthorized");
+            }
+
+        } catch (Exception e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
+
 
     private void writeBody(Object request, HttpURLConnection connection) throws IOException {
          String jsonRequest = new Gson().toJson(request);
