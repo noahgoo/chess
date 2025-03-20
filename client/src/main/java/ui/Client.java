@@ -1,11 +1,16 @@
 package ui;
 
+import exception.ResponseException;
 import net.ServerFacade;
 import request.LoginRequest;
 import request.RegisterRequest;
+import result.LoginResult;
+import result.RegisterResult;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Scanner;
 
 // has the menu
@@ -26,7 +31,7 @@ public class Client {
     private static void displayPreLogin() {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         Scanner scanner = new Scanner(System.in);
-        ServerFacade serverFacade = new ServerFacade();
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
         // display pre login menu
         while (true) {
             out.println("[Logged Out]");
@@ -37,22 +42,60 @@ public class Client {
             out.print(">> ");
 
             String response = scanner.next();
+            if (scanner.hasNextLine()) {
+                scanner.nextLine();
+            }
+            // check response is valid and if not ask again
+            String[] validResponses = {"1", "2", "3", "4"};
+            while (!Arrays.asList(validResponses).contains(response)) {
+                out.print("Not a valid option, please try again: ");
+                response = scanner.next();
+                if (scanner.hasNextLine()) {
+                    scanner.nextLine();
+                }
+            }
 
             switch (response) {
                 case "1":
                     RegisterRequest registerRequest = getRegisterRequest(out, scanner);
-                    serverFacade.register(registerRequest);
-                    // out.println(registerRequest);
+                    if (registerRequest==null) {
+                        out.println("Error: not a valid Register request\n");
+                        break;
+                    }
+                    try {
+                        RegisterResult registerResult = serverFacade.register(registerRequest);
+                        out.println("Logged in as " + registerResult.username() + "\n");
+                        displayPostLogin(out, scanner);
+                    } catch (ResponseException e) {
+                        out.println("Error: could not process Register request\n");
+                        break;
+                    }
                     break;
                 case "2":
                     LoginRequest loginRequest = getLoginRequest(out, scanner);
-                    serverFacade.login(loginRequest);
-                    displayPostLogin(out, scanner);
+                    if (loginRequest==null) {
+                        out.println("Error: not a valid login request\n");
+                        break;
+                    }
+                    try {
+                        LoginResult loginResult = serverFacade.login(loginRequest);
+                        out.println("Logged in as " + loginResult.username() + "\n");
+                        displayPostLogin(out, scanner);
+                    } catch (ResponseException e) {
+                        out.println("Error: could not process Login request\n");
+                        break;
+                    }
                     break;
                 case "3":
-                    // help
+                    out.println(""" 
+                            This is the Chess Pre-Login Menu!
+                            Enter "1" to register a new user with a given USERNAME, PASSWORD, and EMAIL
+                            Enter "2" to login an existing user with a given USERNAME and PASSWORD
+                            Enter "3" to quit
+                            """);
+                    break;
                 case "4":
-                    return;
+                    QUIT = true;
             }
 
             if (QUIT) {
@@ -64,13 +107,21 @@ public class Client {
     private static RegisterRequest getRegisterRequest(PrintStream out, Scanner scanner) {
         out.println("\nPlease provide <USERNAME> <PASSWORD> <EMAIL>");
         out.print(">> ");
-        return new RegisterRequest(scanner.next(), scanner.next(), scanner.next());
+        String[] responses = scanner.nextLine().split("\\s+");
+        if (responses.length==3) {
+            return new RegisterRequest(responses[0], responses[1], responses[2]);
+        }
+        return null;
     }
 
     private static LoginRequest getLoginRequest(PrintStream out, Scanner scanner) {
         out.println("\nPlease provide your <USERNAME> <PASSWORD>");
         out.print(">> ");
-        return new LoginRequest(scanner.next(), scanner.next());
+        String[] response = scanner.nextLine().split("\\s+");
+        if (response.length==2) {
+            return new LoginRequest(response[0], response[1]);
+        }
+        return null;
     }
 
     private static void displayPostLogin(PrintStream out, Scanner scanner) {
@@ -83,12 +134,29 @@ public class Client {
             out.println("\t5. Logout");
             out.println("\t6. Help");
             out.println("\t7. Quit");
+            out.print(">> ");
 
             String response = scanner.next();
 
             switch (response) {
+                case "1":
+                    // create game
+                    break;
+                case "2":
+                    // list games
+                    break;
+                case "3":
+                    // join game
+                    break;
+                case "4":
+                    // observe game
+                    break;
                 case "5":
                     // logout
+                    break;
+                case "6":
+                    // help
+                    break;
                 case "7":
                     QUIT = true;
                     return;
