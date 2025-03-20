@@ -6,6 +6,7 @@ import request.CreateGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
 import result.CreateGameResult;
+import result.ListGameResult;
 import result.LoginResult;
 import result.RegisterResult;
 
@@ -40,4 +41,11 @@ public class ServerFacade {
         var path = serverUrl + "/game";
         return CLIENT.doPost(path, createGameRequest, CreateGameResult.class, authToken);
     }
+
+    public ListGameResult listGames(String authToken) throws ResponseException {
+        var path = serverUrl + "/game";
+        return CLIENT.doGet(path, ListGameResult.class, authToken);
+    }
+
+
 }

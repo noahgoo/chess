@@ -53,9 +53,10 @@ public class ClientCommunicator {
     }
 
     public void doDelete(String urlString, String authToken) throws ResponseException {
+        HttpURLConnection connection = null;
         try {
             URL url = new URL(urlString);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection = (HttpURLConnection) url.openConnection();
 
             connection.setReadTimeout(5000);
             connection.setRequestMethod("DELETE");
@@ -71,9 +72,39 @@ public class ClientCommunicator {
 
         } catch (Exception e) {
             throw new ResponseException(500, e.getMessage());
+        } finally {
+            if (connection!=null) {
+                connection.disconnect();
+            }
         }
     }
 
+    public <T> T doGet(String urlString, Class<T> responseClass, String authToken) throws ResponseException {
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL(urlString);
+            connection = (HttpURLConnection) url.openConnection();
+
+            connection.setReadTimeout(5000);
+            connection.setRequestMethod("GET");
+            connection.setDoOutput(true);
+
+            if (authToken!=null) {
+                connection.addRequestProperty("authorization", authToken);
+            }
+            connection.connect();
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                throw new ResponseException(401, "Error: unauthorized");
+            }
+            return readBody(connection, responseClass);
+        } catch (Exception e) {
+            throw new ResponseException(500, e.getMessage());
+        } finally {
+            if (connection!=null) {
+                connection.disconnect();
+            }
+        }
+    }
 
     private void writeBody(Object request, HttpURLConnection connection) throws IOException {
          String jsonRequest = new Gson().toJson(request);

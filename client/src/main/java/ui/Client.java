@@ -5,9 +5,7 @@ import net.ServerFacade;
 import request.CreateGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
-import result.CreateGameResult;
-import result.LoginResult;
-import result.RegisterResult;
+import result.*;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -135,6 +133,21 @@ public class Client {
         return new CreateGameRequest(scanner.nextLine());
     }
 
+    private static void displayGamesList(PrintStream out, ListGameResult listResult) {
+        out.println("GAMEID | GAMENAME | WHITEUSER | BLACKUSER");
+        for (GameInfo game: listResult.games()) {
+            String builder = game.gameID() +
+                    " | " +
+                    game.gameName() +
+                    " | " +
+                    game.whiteUsername() +
+                    " | " +
+                    game.blackUsername();
+            out.println(builder);
+        }
+        out.println();
+    }
+
     private static void displayPostLogin(PrintStream out, Scanner scanner) {
         while (true) {
             out.println("[Logged In]");
@@ -171,7 +184,12 @@ public class Client {
                     }
                     break;
                 case "2":
-                    // list games
+                    try {
+                        ListGameResult listResult = SERVER_FACADE.listGames(AUTH_TOKEN);
+                        displayGamesList(out, listResult);
+                    } catch (ResponseException e) {
+                        out.println("Error: couldn't provide list of games");
+                    }
                     break;
                 case "3":
                     // join game
