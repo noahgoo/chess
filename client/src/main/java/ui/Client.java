@@ -3,6 +3,7 @@ package ui;
 import exception.ResponseException;
 import net.ServerFacade;
 import request.CreateGameRequest;
+import request.JoinGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
 import result.*;
@@ -133,6 +134,19 @@ public class Client {
         return new CreateGameRequest(scanner.nextLine());
     }
 
+    private static JoinGameRequest getJoinRequest(PrintStream out, Scanner scanner) {
+        out.println("Please provide <PLAYERCOLOR> <GAMEID>");
+        out.print(">> ");
+        if (scanner.hasNext()) {
+            String playerColor = scanner.next();
+            if (scanner.hasNextInt()) {
+                int id = scanner.nextInt();
+                return new JoinGameRequest(playerColor, id);
+            }
+        }
+        return null;
+    }
+
     private static void displayGamesList(PrintStream out, ListGameResult listResult) {
         out.println("GAMEID | GAMENAME | WHITEUSER | BLACKUSER");
         for (GameInfo game: listResult.games()) {
@@ -164,7 +178,7 @@ public class Client {
             if (scanner.hasNextLine()) {
                 scanner.nextLine();
             }
-            String[] validResponses = {"1", "2", "3", "4"};
+            String[] validResponses = {"1", "2", "3", "4", "5", "6", "7"};
             while (!Arrays.asList(validResponses).contains(response)) {
                 out.print("Not a valid option, please try again: ");
                 response = scanner.next();
@@ -192,7 +206,17 @@ public class Client {
                     }
                     break;
                 case "3":
-                    // join game
+                    JoinGameRequest joinRequest = getJoinRequest(out, scanner);
+                    if (joinRequest==null) {
+                        out.println("Error: not a valid join request\n");
+                        break;
+                    }
+                    try {
+                        SERVER_FACADE.joinGame(joinRequest, AUTH_TOKEN);
+                        out.println("Successfully joined game " + joinRequest.gameID() + "\n");
+                    } catch (ResponseException e) {
+                        out.println(e.getMessage());
+                    }
                     break;
                 case "4":
                     // observe game

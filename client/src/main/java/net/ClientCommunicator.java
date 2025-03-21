@@ -84,11 +84,9 @@ public class ClientCommunicator {
         try {
             URL url = new URL(urlString);
             connection = (HttpURLConnection) url.openConnection();
-
             connection.setReadTimeout(5000);
             connection.setRequestMethod("GET");
             connection.setDoOutput(true);
-
             if (authToken!=null) {
                 connection.addRequestProperty("authorization", authToken);
             }
@@ -97,6 +95,45 @@ public class ClientCommunicator {
                 throw new ResponseException(401, "Error: unauthorized");
             }
             return readBody(connection, responseClass);
+        } catch (Exception e) {
+            throw new ResponseException(500, e.getMessage());
+        } finally {
+            if (connection!=null) {
+                connection.disconnect();
+            }
+        }
+    }
+
+    public void doPut(String urlString, Object request, String authToken) throws ResponseException {
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL(urlString);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setReadTimeout(5000);
+            connection.setRequestMethod("GET");
+            connection.setDoOutput(true);
+            if (authToken!=null) {
+                connection.addRequestProperty("authorization", authToken);
+            }
+            writeBody(request, connection);
+            connection.connect();
+
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                if (connection.getResponseCode()==HttpURLConnection.HTTP_UNAUTHORIZED) {
+                    throw new ResponseException(401, "Error: unauthorized");
+                } else if (connection.getResponseCode()==HttpURLConnection.HTTP_FORBIDDEN) {
+                    throw new ResponseException(403, "Error: already taken");
+                } else if (connection.getResponseCode()==HttpURLConnection.HTTP_BAD_REQUEST) {
+                    throw new ResponseException(400, "Error: bad request");
+                }
+                System.out.println(connection.getResponseCode());
+                try (InputStream responseError = connection.getErrorStream()) {
+                    if (responseError != null) {
+                        throw ResponseException.fromJson(responseError);
+                    }
+                }
+            }
+
         } catch (Exception e) {
             throw new ResponseException(500, e.getMessage());
         } finally {

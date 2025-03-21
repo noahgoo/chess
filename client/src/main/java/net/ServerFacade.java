@@ -3,6 +3,7 @@ package net;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import request.CreateGameRequest;
+import request.JoinGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
 import result.CreateGameResult;
@@ -47,5 +48,8 @@ public class ServerFacade {
         return CLIENT.doGet(path, ListGameResult.class, authToken);
     }
 
-
+    public void joinGame(JoinGameRequest joinGameRequest, String authToken) throws ResponseException {
+        var path = serverUrl + "/game";
+        CLIENT.doPut(path, joinGameRequest, authToken);
+    }
 }
