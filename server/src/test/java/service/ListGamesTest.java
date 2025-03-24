@@ -3,7 +3,6 @@ package service;
 import chess.ChessGame;
 import model.GameData;
 import request.CreateGameRequest;
-import result.GameInfo;
 import result.ListGameResult;
 import dataaccess.DataAccessException;
 import org.junit.jupiter.api.Test;

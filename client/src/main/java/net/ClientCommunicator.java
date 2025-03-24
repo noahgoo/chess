@@ -2,7 +2,6 @@ package net;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
-import result.ErrorResult;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -144,7 +143,7 @@ public class ClientCommunicator {
 
     private void writeBody(Object request, HttpURLConnection connection) throws IOException {
          String jsonRequest = new Gson().toJson(request);
-        try(OutputStream requestBody = connection.getOutputStream();) {
+        try(OutputStream requestBody = connection.getOutputStream()) {
             requestBody.write(jsonRequest.getBytes());
         }
     }

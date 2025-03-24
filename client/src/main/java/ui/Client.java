@@ -10,7 +10,6 @@ import request.LoginRequest;
 import request.RegisterRequest;
 import result.*;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;

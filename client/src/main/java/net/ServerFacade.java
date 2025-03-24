@@ -1,7 +1,5 @@
 package net;
 
-import chess.ChessGame;
-import com.google.gson.Gson;
 import exception.ResponseException;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
@@ -12,10 +10,6 @@ import result.ListGameResult;
 import result.LoginResult;
 import result.RegisterResult;
 
-import java.io.IOException;
-
-// one method for every request, take in LoginRequest and return LoginResult
-// has the 7 methods
 public class ServerFacade {
     private static final ClientCommunicator CLIENT = new ClientCommunicator();
     private final String serverUrl;

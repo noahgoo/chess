@@ -3,13 +3,11 @@ package service;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
 import result.CreateGameResult;
-import result.GameInfo;
 import result.ListGameResult;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GameService extends Service {

@@ -1,13 +1,11 @@
 package client;
 
 import exception.ResponseException;
-import model.GameData;
 import net.ServerFacade;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
 import request.LoginRequest;
@@ -17,9 +15,7 @@ import result.ListGameResult;
 import result.LoginResult;
 import result.RegisterResult;
 import server.Server;
-import ui.Client;
 
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class ServerFacadeTests {
@@ -117,9 +113,7 @@ public class ServerFacadeTests {
             LoginRequest loginRequest = new LoginRequest("testUser", "testPass");
             facade.register(registerRequest);
             LoginResult loginResult = facade.login(loginRequest);
-            Assertions.assertDoesNotThrow(() -> {
-                facade.logout(loginResult.authToken());
-            });
+            Assertions.assertDoesNotThrow(() -> facade.logout(loginResult.authToken()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -221,7 +215,7 @@ public class ServerFacadeTests {
             JoinGameRequest joinGameRequest = new JoinGameRequest("BLACK", 1);
             facade.joinGame(joinGameRequest, loginResult.authToken());
             ListGameResult listGameResult = facade.listGames(loginResult.authToken());
-            Assertions.assertEquals(listGameResult.games().getFirst().blackUsername(), "testUser");
+            Assertions.assertEquals("testUser", listGameResult.games().getFirst().blackUsername());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -234,9 +228,7 @@ public class ServerFacadeTests {
             LoginRequest loginRequest = new LoginRequest("testUser", "testPass");
             facade.register(registerRequest);
             facade.login(loginRequest);
-            Assertions.assertDoesNotThrow(() -> {
-                facade.clear(null);
-            });
+            Assertions.assertDoesNotThrow(() -> facade.clear(null));
         } catch (Exception e) {
             e.printStackTrace();
         }
