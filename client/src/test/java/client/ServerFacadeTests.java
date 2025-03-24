@@ -130,7 +130,7 @@ public class ServerFacadeTests {
             CreateGameRequest createGameRequest = new CreateGameRequest(null);
             ResponseException e = Assertions.assertThrows(ResponseException.class, () ->
                     facade.createGame(createGameRequest, loginResult.authToken()));
-            Assertions.assertEquals(500, e.StatusCode());
+            Assertions.assertEquals(500, e.statusCode());
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -17,16 +17,16 @@ import java.util.Scanner;
 
 // has the menu
 public class Client {
-    static boolean QUIT = false;
-    static String AUTH_TOKEN;
-    static ServerFacade SERVER_FACADE;
+    static boolean quit = false;
+    static String authToken;
+    static ServerFacade serverFacade;
 
     public static void main(String[] args) {
         var serverUrl = "http://localhost:8080";
         if (args.length == 1) {
             serverUrl = args[0];
         }
-        SERVER_FACADE = new ServerFacade(serverUrl);
+        serverFacade = new ServerFacade(serverUrl);
         displayPreLogin();
     }
 
@@ -64,9 +64,9 @@ public class Client {
                         break;
                     }
                     try {
-                        RegisterResult registerResult = SERVER_FACADE.register(registerRequest);
+                        RegisterResult registerResult = serverFacade.register(registerRequest);
                         out.println("Logged in as " + registerResult.username() + "\n");
-                        AUTH_TOKEN = registerResult.authToken();
+                        authToken = registerResult.authToken();
                         displayPostLogin(out, scanner);
                     } catch (ResponseException e) {
                         out.println("Error: could not process Register request\n");
@@ -80,9 +80,9 @@ public class Client {
                         break;
                     }
                     try {
-                        LoginResult loginResult = SERVER_FACADE.login(loginRequest);
+                        LoginResult loginResult = serverFacade.login(loginRequest);
                         out.println("Logged in as " + loginResult.username() + "\n");
-                        AUTH_TOKEN = loginResult.authToken();
+                        authToken = loginResult.authToken();
                         displayPostLogin(out, scanner);
                     } catch (ResponseException e) {
                         out.println("Error: could not process Login request\n");
@@ -98,10 +98,10 @@ public class Client {
                             """);
                     break;
                 case "4":
-                    QUIT = true;
+                    quit = true;
             }
 
-            if (QUIT) {
+            if (quit) {
                 return;
             }
         }
@@ -205,7 +205,7 @@ public class Client {
                 case "1":
                     CreateGameRequest createGameRequest = getCreateRequest(out, scanner);
                     try {
-                        CreateGameResult gameResult = SERVER_FACADE.createGame(createGameRequest, AUTH_TOKEN);
+                        CreateGameResult gameResult = serverFacade.createGame(createGameRequest, authToken);
                         out.println("Successfully created game with ID " + gameResult.gameID() + "\n");
                     } catch (ResponseException e) {
                         out.println("Error: could not create new game");
@@ -213,7 +213,7 @@ public class Client {
                     break;
                 case "2":
                     try {
-                        ListGameResult listResult = SERVER_FACADE.listGames(AUTH_TOKEN);
+                        ListGameResult listResult = serverFacade.listGames(authToken);
                         displayGamesList(out, listResult);
                     } catch (ResponseException e) {
                         out.println("Error: couldn't provide list of games");
@@ -226,9 +226,9 @@ public class Client {
                         break;
                     }
                     try {
-                        SERVER_FACADE.joinGame(joinRequest, AUTH_TOKEN);
+                        serverFacade.joinGame(joinRequest, authToken);
                         out.println("Successfully joined game " + joinRequest.gameID() + "\n");
-                        displayChessBoard(SERVER_FACADE.listGames(AUTH_TOKEN), joinRequest);
+                        displayChessBoard(serverFacade.listGames(authToken), joinRequest);
                     } catch (ResponseException e) {
                         out.println(e.getMessage());
                     }
@@ -238,14 +238,14 @@ public class Client {
                     int gameid = scanner.nextInt();
                     JoinGameRequest observeRequest = new JoinGameRequest("WHITE", gameid);
                     try {
-                        displayChessBoard(SERVER_FACADE.listGames(AUTH_TOKEN), observeRequest);
+                        displayChessBoard(serverFacade.listGames(authToken), observeRequest);
                     } catch (ResponseException e) {
                         out.println("Error: unable to observe game " + observeRequest.gameID());
                     }
                     break;
                 case "5":
                     try {
-                        SERVER_FACADE.logout(AUTH_TOKEN);
+                        serverFacade.logout(authToken);
                         displayPreLogin();
                     } catch (ResponseException e) {
                         out.println(e.getMessage());
@@ -264,7 +264,7 @@ public class Client {
                             """);
                     break;
                 case "7":
-                    QUIT = true;
+                    quit = true;
                     return;
             }
         }

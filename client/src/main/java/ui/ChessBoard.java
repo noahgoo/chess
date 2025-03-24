@@ -13,20 +13,11 @@ import static ui.EscapeSequences.*;
 public class ChessBoard {
     private static final int BOARD_SIZE_IN_SQUARES = 8;
     private static final String EMPTY = "   ";
-    private static boolean FLIP;
-
-    public static void main(String[] args) {
-        chess.ChessBoard board = new chess.ChessBoard();
-        board.resetBoard();
-        board.addPiece(new ChessPosition(4,4),new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING));
-        board.addPiece(new ChessPosition(5,1),new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN));
-        drawChessBoard(board, false);
-        drawChessBoard(board, true);
-    }
+    private static boolean flip;
 
     public static void drawChessBoard(chess.ChessBoard board, boolean flip) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        FLIP = flip;
+        ChessBoard.flip = flip;
         out.print(ERASE_SCREEN);
 
         drawHeaders(out);
@@ -41,7 +32,7 @@ public class ChessBoard {
     private static void drawHeaders(PrintStream out) {
         setGray(out);
         String[] headers = { " a ", " b ", " c ", " d ", " e ", " f ", " g ", " h " };
-        if (FLIP) {
+        if (flip) {
             headers = new String[]{" h ", " g ", " f ", " e ", " d ", " c ", " b ", " a "};
         }
 
@@ -64,7 +55,7 @@ public class ChessBoard {
     }
 
     private static void drawBoard(PrintStream out, chess.ChessBoard board) {
-        if (FLIP) {
+        if (flip) {
             for (int boardRow = 1; boardRow < 9; ++boardRow) {
                 drawRowOfSquares(out, boardRow, board);
             }
@@ -82,7 +73,7 @@ public class ChessBoard {
         for (int col = 0; col < BOARD_SIZE_IN_SQUARES; ++col) {
             // check if it's flipped or not
             int column;
-            if (FLIP) {
+            if (flip) {
                 column = 9 - (col + 1);
             } else {
                 column = col + 1;
@@ -159,9 +150,9 @@ public class ChessBoard {
         printHeaderText(out, row);
     }
 
-    private static void printPiece(PrintStream out, String bg_color, String teamColor, String piece) {
-        out.print(bg_color);
-        out.print(Objects.requireNonNullElse(teamColor, bg_color));
+    private static void printPiece(PrintStream out, String bgColor, String teamColor, String piece) {
+        out.print(bgColor);
+        out.print(Objects.requireNonNullElse(teamColor, bgColor));
         out.print(Objects.requireNonNullElse(piece, EMPTY));
     }
 
