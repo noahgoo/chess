@@ -1,6 +1,8 @@
 package result;
 
+import model.GameData;
+
 import java.util.List;
 
-public record ListGameResult(List<GameInfo> games) {
+public record ListGameResult(List<GameData> games) {
 }

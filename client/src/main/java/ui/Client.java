@@ -1,6 +1,8 @@
 package ui;
 
+import chess.ChessGame;
 import exception.ResponseException;
+import model.GameData;
 import net.ServerFacade;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
@@ -149,7 +151,7 @@ public class Client {
 
     private static void displayGamesList(PrintStream out, ListGameResult listResult) {
         out.println("GAMEID | GAMENAME | WHITEUSER | BLACKUSER");
-        for (GameInfo game: listResult.games()) {
+        for (GameData game: listResult.games()) {
             String builder = game.gameID() +
                     " | " +
                     game.gameName() +
@@ -160,6 +162,21 @@ public class Client {
             out.println(builder);
         }
         out.println();
+    }
+
+    private static void displayChessBoard(ListGameResult listResult, JoinGameRequest joinRequest) {
+        ChessGame currentGame = null;
+        for (GameData game: listResult.games()) {
+            if (game.gameID()==joinRequest.gameID()) {
+                currentGame = game.game();
+            }
+        }
+        if (currentGame!=null&&joinRequest.playerColor().equals("WHITE")) {
+            ChessBoard.drawChessBoard(currentGame.getBoard(), false);
+        } else if (currentGame!=null&&joinRequest.playerColor().equals("BLACK")) {
+            ChessBoard.drawChessBoard(currentGame.getBoard(), true);
+        }
+
     }
 
     private static void displayPostLogin(PrintStream out, Scanner scanner) {
@@ -214,12 +231,20 @@ public class Client {
                     try {
                         SERVER_FACADE.joinGame(joinRequest, AUTH_TOKEN);
                         out.println("Successfully joined game " + joinRequest.gameID() + "\n");
+                        displayChessBoard(SERVER_FACADE.listGames(AUTH_TOKEN), joinRequest);
                     } catch (ResponseException e) {
                         out.println(e.getMessage());
                     }
                     break;
                 case "4":
-
+                    out.print("Please enter GAMEID: ");
+                    int gameid = scanner.nextInt();
+                    JoinGameRequest observeRequest = new JoinGameRequest("WHITE", gameid);
+                    try {
+                        displayChessBoard(SERVER_FACADE.listGames(AUTH_TOKEN), observeRequest);
+                    } catch (ResponseException e) {
+                        out.println("Error: unable to observe game " + observeRequest.gameID());
+                    }
                     break;
                 case "5":
                     try {
