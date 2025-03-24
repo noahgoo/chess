@@ -53,4 +53,9 @@ public class ServerFacade {
         var path = serverUrl + "/game";
         CLIENT.doPut(path, joinGameRequest, authToken);
     }
+
+    public void clear(String authToken) throws ResponseException {
+        var path = serverUrl + "/db";
+        CLIENT.doDelete(path, authToken);
+    }
 }

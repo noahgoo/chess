@@ -23,13 +23,11 @@ public class Client {
     static ServerFacade SERVER_FACADE;
 
     public static void main(String[] args) {
-//        var serverUrl = "http://localhost:8080";
-//        if (args.length == 1) {
-//            serverUrl = args[0];
-//        }
-//
-//        new Server(serverUrl).run();
-        SERVER_FACADE = new ServerFacade("http://localhost:8080");
+        var serverUrl = "http://localhost:8080";
+        if (args.length == 1) {
+            serverUrl = args[0];
+        }
+        SERVER_FACADE = new ServerFacade(serverUrl);
         displayPreLogin();
     }
 

@@ -33,12 +33,11 @@ public class ClientCommunicator {
 
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 return readBody(connection, responseClass);
+            } else if (connection.getResponseCode() == HttpURLConnection.HTTP_BAD_REQUEST) {
+                throw new ResponseException(400, "Error: bad request");
+            } else if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                throw new ResponseException(401, "Error: no existing user or wrong password");
             } else {
-                try (InputStream responseError = connection.getErrorStream()) {
-                    if (responseError != null) {
-                        throw ResponseException.fromJson(responseError);
-                    }
-                }
                 throw new ResponseException(connection.getResponseCode(), "Unknown failure: " + connection.getResponseCode());
             }
         } catch (ResponseException ex) {
