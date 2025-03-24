@@ -98,11 +98,11 @@ public class Client {
                             """);
                     break;
                 case "4":
-                    quit = true;
+                    System.exit(0);
             }
 
             if (quit) {
-                return;
+                System.exit(0);
             }
         }
     }
@@ -140,6 +140,7 @@ public class Client {
             String playerColor = scanner.next();
             if (scanner.hasNextInt()) {
                 int id = scanner.nextInt();
+                scanner.nextLine();
                 return new JoinGameRequest(playerColor, id);
             }
         }
@@ -161,7 +162,7 @@ public class Client {
         out.println();
     }
 
-    private static void displayChessBoard(ListGameResult listResult, JoinGameRequest joinRequest) {
+    private static void displayChessBoard(ListGameResult listResult, JoinGameRequest joinRequest) throws ResponseException {
         ChessGame currentGame = null;
         for (GameData game: listResult.games()) {
             if (game.gameID()==joinRequest.gameID()) {
@@ -172,6 +173,8 @@ public class Client {
             ChessBoard.drawChessBoard(currentGame.getBoard(), false);
         } else if (currentGame!=null&&joinRequest.playerColor().equals("BLACK")) {
             ChessBoard.drawChessBoard(currentGame.getBoard(), true);
+        } else {
+            throw new ResponseException(400, "Error: no game found");
         }
 
     }
@@ -235,12 +238,18 @@ public class Client {
                     break;
                 case "4":
                     out.print("Please enter GAMEID: ");
-                    int gameid = scanner.nextInt();
-                    JoinGameRequest observeRequest = new JoinGameRequest("WHITE", gameid);
-                    try {
-                        displayChessBoard(serverFacade.listGames(authToken), observeRequest);
-                    } catch (ResponseException e) {
-                        out.println("Error: unable to observe game " + observeRequest.gameID());
+                    if (scanner.hasNextInt()) {
+                        int gameid = scanner.nextInt();
+                        JoinGameRequest observeRequest = new JoinGameRequest("WHITE", gameid);
+                        scanner.nextLine();
+                        try {
+                            displayChessBoard(serverFacade.listGames(authToken), observeRequest);
+                        } catch (ResponseException e) {
+                            out.println("Error: unable to observe game " + observeRequest.gameID());
+                        }
+                    } else {
+                        out.println("Invalid gameID");
+                        break;
                     }
                     break;
                 case "5":
