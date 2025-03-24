@@ -19,14 +19,15 @@ public class ChessBoard {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         ChessBoard.flip = flip;
         out.print(ERASE_SCREEN);
+        out.println();
 
         drawHeaders(out);
         drawBoard(out, board);
         drawHeaders(out);
 
+        setDefault(out);
         out.println();
-        out.print(SET_BG_COLOR_BLACK);
-        out.print(SET_TEXT_COLOR_WHITE);
+
     }
 
     private static void drawHeaders(PrintStream out) {
@@ -42,7 +43,7 @@ public class ChessBoard {
         }
         out.print(EMPTY);
 
-        setBlack(out);
+        setDefault(out);
         out.println();
     }
 
@@ -99,7 +100,7 @@ public class ChessBoard {
         }
 
         drawEdgeSquare(out, rowNumber);
-        setBlack(out);
+        setDefault(out);
         out.println();
     }
 
@@ -164,6 +165,10 @@ public class ChessBoard {
     private static void setGray(PrintStream out) {
         out.print(SET_BG_COLOR_LIGHT_GREY);
         out.print(SET_TEXT_COLOR_LIGHT_GREY);
+    }
+
+    private static void setDefault(PrintStream out) {
+        out.print("\u001B[0m");
     }
 
 }
