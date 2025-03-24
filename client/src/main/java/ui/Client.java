@@ -219,7 +219,7 @@ public class Client {
                     }
                     break;
                 case "4":
-                    // observe game
+
                     break;
                 case "5":
                     try {
@@ -231,7 +231,15 @@ public class Client {
                     }
                     break;
                 case "6":
-                    // help
+                    out.println(""" 
+                            This is the Chess Menu!
+                            Enter "1" to create a new game with given GAMENAME
+                            Enter "2" to list all existing games
+                            Enter "3" to join a game with a given GAMEID
+                            Enter "4" to observe a game with a given GAMEID
+                            Enter "5" to logout
+                            Enter "7" to quit
+                            """);
                     break;
                 case "7":
                     QUIT = true;

@@ -110,7 +110,7 @@ public class ClientCommunicator {
             URL url = new URL(urlString);
             connection = (HttpURLConnection) url.openConnection();
             connection.setReadTimeout(5000);
-            connection.setRequestMethod("GET");
+            connection.setRequestMethod("PUT");
             connection.setDoOutput(true);
             if (authToken!=null) {
                 connection.addRequestProperty("authorization", authToken);
