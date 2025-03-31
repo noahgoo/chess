@@ -94,7 +94,7 @@ public class Client {
                             This is the Chess Pre-Login Menu!
                             Enter "1" to register a new user with a given USERNAME, PASSWORD, and EMAIL
                             Enter "2" to login an existing user with a given USERNAME and PASSWORD
-                            Enter "3" to quit
+                            Enter "4" to quit
                             """);
                     break;
                 case "4":
