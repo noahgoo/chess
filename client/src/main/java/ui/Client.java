@@ -279,4 +279,44 @@ public class Client {
         }
     }
 
+    private static void displayGame(PrintStream out, Scanner scanner) {
+        while (true) {
+            out.println("[IN GAME]");
+            out.println("\t1. Help");
+            out.println("\t2. Redraw Chessboard");
+            out.println("\t3. Leave");
+            out.println("\t4. Make Move");
+            out.println("\t5. Resign");
+            out.println("\t6. Highlight Legal Moves");
+
+            String response = scanner.next();
+            if (scanner.hasNextLine()) {
+                scanner.nextLine();
+            }
+            String[] validResponses = {"1", "2", "3", "4", "5", "6"};
+            while (!Arrays.asList(validResponses).contains(response)) {
+                out.print("Not a valid option, please try again: ");
+                response = scanner.next();
+                if (scanner.hasNextLine()) {
+                    scanner.nextLine();
+                }
+            }
+
+            switch (response) {
+                case "1":
+                    // help
+                case "2":
+                    // redraw the chessboard
+                case "3":
+                    // leave the game
+                case "4":
+                    // make a move
+                case "5":
+                    // resign
+                case "6":
+                    // highlight legal moves
+            }
+        }
+    }
+
 }
