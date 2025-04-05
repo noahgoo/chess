@@ -3,12 +3,15 @@ package ui;
 import chess.ChessGame;
 import exception.ResponseException;
 import model.GameData;
+import net.MessageHandler;
 import net.ServerFacade;
+import net.WebSocketFacade;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
 import result.*;
+import websocket.messages.ServerMessage;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -20,17 +23,20 @@ public class Client {
     static boolean quit = false;
     static String authToken;
     static ServerFacade serverFacade;
+    private static WebSocketFacade wsf;
+    private static String serverUrl = "http://localhost:8080";
+    private static MessageHandler messageHandler;
 
     public static void main(String[] args) {
-        var serverUrl = "http://localhost:8080";
+        //var serverUrl = "http://localhost:8080";
         if (args.length == 1) {
             serverUrl = args[0];
         }
         serverFacade = new ServerFacade(serverUrl);
-        displayPreLogin();
+        displayPreLoginUI();
     }
 
-    private static void displayPreLogin() {
+    private static void displayPreLoginUI() {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         Scanner scanner = new Scanner(System.in);
         // display pre login menu
@@ -67,7 +73,7 @@ public class Client {
                         RegisterResult registerResult = serverFacade.register(registerRequest);
                         out.println("Logged in as " + registerResult.username() + "\n");
                         authToken = registerResult.authToken();
-                        displayPostLogin(out, scanner);
+                        displayPostLoginUI(out, scanner);
                     } catch (ResponseException e) {
                         out.println("Error: could not process Register request\n");
                         break;
@@ -83,7 +89,7 @@ public class Client {
                         LoginResult loginResult = serverFacade.login(loginRequest);
                         out.println("Logged in as " + loginResult.username() + "\n");
                         authToken = loginResult.authToken();
-                        displayPostLogin(out, scanner);
+                        displayPostLoginUI(out, scanner);
                     } catch (ResponseException e) {
                         out.println("Error: could not process Login request\n");
                         break;
@@ -179,7 +185,7 @@ public class Client {
 
     }
 
-    private static void displayPostLogin(PrintStream out, Scanner scanner) {
+    private static void displayPostLoginUI(PrintStream out, Scanner scanner) {
         while (true) {
             out.println("[Logged In]");
             out.println("\t1. Create Game");
@@ -229,8 +235,16 @@ public class Client {
                         break;
                     }
                     try {
+                        // Call the server join HTTP API to join them to the game. This step is only done for players. Observers do not need to make the join HTTP API request.
+                        //Open a WebSocket connection with the server (using the /ws endpoint) so it can send and receive gameplay messages.
+                        //Send a CONNECT WebSocket message to the server.
+                        //Transition to the gameplay UI. The gameplay UI draws the chess board and allows the user to perform the gameplay commands described in the previous section.
                         serverFacade.joinGame(joinRequest, authToken);
+                        wsf = new WebSocketFacade(serverUrl);
+                        wsf.connect(authToken, joinRequest.gameID());
                         out.println("Successfully joined game " + joinRequest.gameID() + "\n");
+                        displayGameUI(out, scanner);
+
                         displayChessBoard(serverFacade.listGames(authToken), joinRequest);
                     } catch (ResponseException e) {
                         out.println(e.getMessage());
@@ -255,7 +269,7 @@ public class Client {
                 case "5":
                     try {
                         serverFacade.logout(authToken);
-                        displayPreLogin();
+                        displayPreLoginUI();
                     } catch (ResponseException e) {
                         out.println(e.getMessage());
                         break;
@@ -279,10 +293,11 @@ public class Client {
         }
     }
 
-    private static void displayGame(PrintStream out, Scanner scanner) {
+    private static void displayGameUI(PrintStream out, Scanner scanner) {
         while (true) {
             out.println("[IN GAME]");
             out.println("\t1. Help");
+
             out.println("\t2. Redraw Chessboard");
             out.println("\t3. Leave");
             out.println("\t4. Make Move");

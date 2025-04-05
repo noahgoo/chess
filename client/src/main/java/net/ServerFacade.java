@@ -11,7 +11,7 @@ import result.LoginResult;
 import result.RegisterResult;
 
 public class ServerFacade {
-    private static final ClientCommunicator CLIENT = new ClientCommunicator();
+    private static final HTTPCommunicator CLIENT = new HTTPCommunicator();
     private final String serverUrl;
 
     public ServerFacade(String url) {

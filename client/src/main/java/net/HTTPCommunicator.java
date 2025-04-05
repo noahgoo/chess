@@ -11,7 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 // communicates with server based on get and post
-public class ClientCommunicator {
+public class HTTPCommunicator {
 
     public <T> T doPost(String urlString, Object request, Class<T> responseClass, String authToken) throws ResponseException {
         HttpURLConnection connection = null;
