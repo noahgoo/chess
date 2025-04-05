@@ -243,7 +243,7 @@ public class Client {
                         wsf = new WebSocketFacade(serverUrl);
                         wsf.connect(authToken, joinRequest.gameID());
                         out.println("Successfully joined game " + joinRequest.gameID() + "\n");
-                        displayGameUI(out, scanner);
+                        displayGameUI(out, scanner, joinRequest.gameID());
 
                         displayChessBoard(serverFacade.listGames(authToken), joinRequest);
                     } catch (ResponseException e) {
@@ -293,7 +293,7 @@ public class Client {
         }
     }
 
-    private static void displayGameUI(PrintStream out, Scanner scanner) {
+    private static void displayGameUI(PrintStream out, Scanner scanner, int gameID) {
         while (true) {
             out.println("[IN GAME]");
             out.println("\t1. Help");
@@ -323,11 +323,40 @@ public class Client {
                 case "2":
                     // redraw the chessboard
                 case "3":
-                    // leave the game
+                    // leave
+                    out.println("Are you sure you want to leave? (y/n)");
+                    String check = scanner.nextLine();
+                    if (check.equals("n")) {
+                        break;
+                    } else if (!check.equals("y")) {
+                        out.println("Invalid answer");
+                    } else {
+                        try {
+                            wsf.leave(authToken, gameID);
+                            return;
+                        } catch (ResponseException e) {
+                            out.println("Unauthorized");
+                        }
+                    }
+                    break;
                 case "4":
                     // make a move
                 case "5":
                     // resign
+                    out.println("Are you sure you want to resign? (y/n)");
+                    String resp = scanner.nextLine();
+                    if (resp.equals("n")) {
+                        break;
+                    } else if (!resp.equals("y")) {
+                        out.println("Invalid answer");
+                    } else {
+                        try {
+                            wsf.resign(authToken, gameID);
+                        } catch (ResponseException e) {
+                            out.println("Unauthorized");
+                        }
+                    }
+                    break;
                 case "6":
                     // highlight legal moves
             }
