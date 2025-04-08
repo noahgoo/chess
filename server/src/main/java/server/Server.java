@@ -31,6 +31,7 @@ public class Server {
     }
 
     private static void createRoutes() {
+        Spark.webSocket("/ws", WEB_SOCKET_HANDLER);
         Spark.post("/session", USER_HANDLER::login);
         Spark.post("/user" , USER_HANDLER::register);
         Spark.delete("/session", USER_HANDLER::logout);
@@ -40,7 +41,5 @@ public class Server {
         Spark.put("/game", GAME_HANDLER::joinGame);
 
         Spark.delete("/db", CLEAR_HANDLER::clear);
-
-        Spark.webSocket("/ws", WebSocketHandler.class);
     }
 }

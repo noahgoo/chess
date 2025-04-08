@@ -100,6 +100,9 @@ public class SQLGameDAO extends DAO implements GameDAO {
                     } else if (playerColor.equals("BLACK")&&rs.getString("blackUsername")==null) {
                         updateStatement = "UPDATE game SET blackUsername=? WHERE gameID=?";
                         executeUpdate(updateStatement, authData.username(), game.gameID());
+                    } else if (authData==null) {
+                        updateStatement = "UPDATE game SET game=? WHERE gameID=?";
+                        executeUpdate(updateStatement, game.game(), game.gameID());
                     } else { throw new DataAccessException("Error: already taken"); }
                 }
              }

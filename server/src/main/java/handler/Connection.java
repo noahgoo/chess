@@ -8,16 +8,14 @@ public class Connection {
     public String authToken;
     public Integer gameID;
     public Session session;
-    public String username;
 
-    public Connection(String authToken, Integer gameID, Session session, String username) {
+    public Connection(String authToken, Integer gameID, Session session) {
         this.authToken = authToken;
         this.gameID = gameID;
         this.session = session;
-        this.username = username;
     }
 
-//    public void send(String msg) throws IOException {
-//        session.getRemote().sendString(msg);
-//    }
+    public void send(String msg) throws IOException {
+        session.getRemote().sendString(msg);
+    }
 }

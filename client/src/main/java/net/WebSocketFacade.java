@@ -5,7 +5,6 @@ import exception.ResponseException;
 import websocket.commands.UserGameCommand;
 import websocket.commands.UserGameCommand.*;
 import websocket.messages.ServerMessage;
-
 import javax.imageio.IIOException;
 import javax.websocket.MessageHandler;
 import javax.websocket.*;
