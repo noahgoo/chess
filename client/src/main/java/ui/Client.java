@@ -26,6 +26,7 @@ public class Client {
     private static WebSocketFacade wsf;
     private static String serverUrl = "http://localhost:8080";
     private static MessageHandler messageHandler;
+    private static String username;
 
     public static void main(String[] args) {
         //var serverUrl = "http://localhost:8080";
@@ -73,6 +74,7 @@ public class Client {
                         RegisterResult registerResult = serverFacade.register(registerRequest);
                         out.println("Logged in as " + registerResult.username() + "\n");
                         authToken = registerResult.authToken();
+                        username = registerResult.username();
                         displayPostLoginUI(out, scanner);
                     } catch (ResponseException e) {
                         out.println("Error: could not process Register request\n");
@@ -89,6 +91,7 @@ public class Client {
                         LoginResult loginResult = serverFacade.login(loginRequest);
                         out.println("Logged in as " + loginResult.username() + "\n");
                         authToken = loginResult.authToken();
+                        username = loginResult.username();
                         displayPostLoginUI(out, scanner);
                     } catch (ResponseException e) {
                         out.println("Error: could not process Login request\n");
@@ -241,7 +244,7 @@ public class Client {
                         //Transition to the gameplay UI. The gameplay UI draws the chess board and allows the user to perform the gameplay commands described in the previous section.
                         serverFacade.joinGame(joinRequest, authToken);
                         wsf = new WebSocketFacade(serverUrl);
-                        wsf.connect(authToken, joinRequest.gameID());
+                        wsf.connect(authToken, joinRequest.gameID(), username);
                         out.println("Successfully joined game " + joinRequest.gameID() + "\n");
                         displayGameUI(out, scanner, joinRequest.gameID());
 
@@ -320,6 +323,14 @@ public class Client {
             switch (response) {
                 case "1":
                     // help
+                    out.println("""
+                            This is the Game Menu!
+                            Enter "2" to redraw the Chessboard on your screen.
+                            Enter "3" to leave the game.
+                            Enter "4" to make a move with a piece.
+                            Enter "5" to resign and lose the game.
+                            Enter "6" to highlight legal moves for a piece.
+                            """);
                 case "2":
                     // redraw the chessboard
                 case "3":
@@ -332,7 +343,7 @@ public class Client {
                         out.println("Invalid answer");
                     } else {
                         try {
-                            wsf.leave(authToken, gameID);
+                            wsf.leave(authToken, gameID, username);
                             return;
                         } catch (ResponseException e) {
                             out.println("Unauthorized");
@@ -351,7 +362,7 @@ public class Client {
                         out.println("Invalid answer");
                     } else {
                         try {
-                            wsf.resign(authToken, gameID);
+                            wsf.resign(authToken, gameID, username);
                         } catch (ResponseException e) {
                             out.println("Unauthorized");
                         }

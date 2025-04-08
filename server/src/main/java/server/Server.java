@@ -4,12 +4,14 @@ import dataaccess.DatabaseManager;
 import handler.ClearHandler;
 import handler.GameHandler;
 import handler.UserHandler;
+import handler.WebSocketHandler;
 import spark.*;
 
 public class Server {
     private static final UserHandler USER_HANDLER = new UserHandler();
     private static final GameHandler GAME_HANDLER = new GameHandler();
     private static final ClearHandler CLEAR_HANDLER = new ClearHandler();
+    private static final WebSocketHandler WEB_SOCKET_HANDLER = new WebSocketHandler();
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -38,5 +40,7 @@ public class Server {
         Spark.put("/game", GAME_HANDLER::joinGame);
 
         Spark.delete("/db", CLEAR_HANDLER::clear);
+
+        Spark.webSocket("/ws", WebSocketHandler.class);
     }
 }
