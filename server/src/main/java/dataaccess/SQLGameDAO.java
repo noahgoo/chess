@@ -94,7 +94,12 @@ public class SQLGameDAO extends DAO implements GameDAO {
              try (var rs = ps.executeQuery()) {
                 if (rs.next()) {
                     String updateStatement;
-                    if (playerColor.equals("WHITE")&&rs.getString("whiteUsername")==null) {
+                    if (playerColor==null) {
+                        updateStatement = "UPDATE game SET game=? WHERE gameID=?";
+                        String newGame = new Gson().toJson(game.game());
+                        executeUpdate(updateStatement, newGame, game.gameID());
+                    }
+                    else if (playerColor.equals("WHITE")&&rs.getString("whiteUsername")==null) {
                         updateStatement = "UPDATE game SET whiteUsername=? WHERE gameID=?";
                         executeUpdate(updateStatement, authData.username(), game.gameID());
                     } else if (playerColor.equals("BLACK")&&rs.getString("blackUsername")==null) {
@@ -102,7 +107,14 @@ public class SQLGameDAO extends DAO implements GameDAO {
                         executeUpdate(updateStatement, authData.username(), game.gameID());
                     } else if (authData==null) {
                         updateStatement = "UPDATE game SET game=? WHERE gameID=?";
-                        executeUpdate(updateStatement, game.game(), game.gameID());
+                        String newGame = new Gson().toJson(game.game());
+                        executeUpdate(updateStatement, newGame, game.gameID());
+                    } else if (playerColor.equals("WHITE")&&game.whiteUsername().equals(authData.username())) {
+                        updateStatement = "UPDATE game SET whiteUsername=? WHERE gameID=?";
+                        executeUpdate(updateStatement, null, game.gameID());
+                    } else if (playerColor.equals("BLACK")&&game.blackUsername().equals(authData.username())) {
+                        updateStatement = "UPDATE game SET blackUsername=? WHERE gameID=?";
+                        executeUpdate(updateStatement, null, game.gameID());
                     } else { throw new DataAccessException("Error: already taken"); }
                 }
              }
