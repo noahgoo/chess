@@ -2,6 +2,7 @@ package handler;
 
 import chess.ChessGame;
 import chess.ChessGame.TeamColor;
+import chess.ChessMove;
 import chess.ChessPosition;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
@@ -21,6 +22,7 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage.ServerMessageType;
 
 import java.io.IOException;
+import java.util.Collection;
 
 @WebSocket
 public class WebSocketHandler extends Handler {
@@ -99,18 +101,7 @@ public class WebSocketHandler extends Handler {
             var validMoves = game.validMoves(startMove);
             boolean valid = false;
             if (validMoves!=null) {
-                for (var move: validMoves) {
-                    var boardPiece = game.getBoard().getPiece(startMove);
-                    if (move.getEndPosition().equals(command.getMove().getEndPosition())&&color.equals(boardPiece.getTeamColor())) {
-                        if (color.equals(TeamColor.WHITE)&&(gameData.whiteUsername().equals(authData.username()))) {
-                            valid = true;
-                            break;
-                        } else if (color.equals(TeamColor.BLACK)&&(gameData.blackUsername().equals(authData.username()))) {
-                            valid = true;
-                            break;
-                        }
-                    }
-                }
+                valid = isValid(command, validMoves, game, startMove, color, gameData, authData, valid);
             } else {
                 connections.sendError(command, "Error: no piece in starting position", authData.username());
                 return;
@@ -171,6 +162,22 @@ public class WebSocketHandler extends Handler {
             NotificationMessage checkNotification = new NotificationMessage(ServerMessageType.NOTIFICATION, gameMessage);
             connections.broadcast(command, checkNotification, true);
         }
+    }
+
+    private boolean isValid(MakeMoveCommand command, Collection<ChessMove> validMoves, ChessGame game, ChessPosition startMove, TeamColor color, GameData gameData, AuthData authData, boolean valid) {
+        for (var move: validMoves) {
+            var boardPiece = game.getBoard().getPiece(startMove);
+            if (move.getEndPosition().equals(command.getMove().getEndPosition())&& color.equals(boardPiece.getTeamColor())) {
+                if (color.equals(TeamColor.WHITE)&&(gameData.whiteUsername().equals(authData.username()))) {
+                    valid = true;
+                    break;
+                } else if (color.equals(TeamColor.BLACK)&&(gameData.blackUsername().equals(authData.username()))) {
+                    valid = true;
+                    break;
+                }
+            }
+        }
+        return valid;
     }
 
     private void leave(UserGameCommand command, Session session) throws IOException {

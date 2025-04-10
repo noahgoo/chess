@@ -29,33 +29,35 @@ public class WebSocketFacade extends Endpoint {
             URI socketURI = new URI(url + "/ws");
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
-            this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
-                // handle message here
-                try {
-                    JsonObject object = JsonParser.parseString(message).getAsJsonObject();
-                    String typeString = object.get("serverMessageType").getAsString();
-                    ServerMessage.ServerMessageType type = ServerMessage.ServerMessageType.valueOf(typeString);
-                    Gson gson = new Gson();
-                    ServerMessage msg = null;
-
-                    switch (type) {
-                        case LOAD_GAME -> msg = gson.fromJson(message, LoadGameMessage.class);
-                        case NOTIFICATION -> msg = gson.fromJson(message, NotificationMessage.class);
-                        case ERROR -> msg = gson.fromJson(message, ErrorMessage.class);
-                        default -> messageHandler.notify(new ErrorMessage(ServerMessage.ServerMessageType.ERROR,
-                                "Error: not a valid incoming server message"));
-                    }
-                    if (msg!=null) {
-                        messageHandler.notify(msg);
-                    }
-                } catch (Exception e) {
-                    messageHandler.notify(new ErrorMessage(ServerMessage.ServerMessageType.ERROR,
-                            "Error: unable to process incoming message"));
-                }
-            });
+            // handle message here
+            this.session.addMessageHandler((MessageHandler.Whole<String>) this::handleMessage);
         } catch (URISyntaxException | DeploymentException | IOException e) {
             throw new ResponseException(500, "WebSocket error: " + e.getClass().getSimpleName() + " - " + e.getMessage());
 
+        }
+    }
+
+    private void handleMessage(String message) {
+        try {
+            JsonObject object = JsonParser.parseString(message).getAsJsonObject();
+            String typeString = object.get("serverMessageType").getAsString();
+            ServerMessage.ServerMessageType type = ServerMessage.ServerMessageType.valueOf(typeString);
+            Gson gson = new Gson();
+            ServerMessage msg = null;
+
+            switch (type) {
+                case LOAD_GAME -> msg = gson.fromJson(message, LoadGameMessage.class);
+                case NOTIFICATION -> msg = gson.fromJson(message, NotificationMessage.class);
+                case ERROR -> msg = gson.fromJson(message, ErrorMessage.class);
+                default -> messageHandler.notify(new ErrorMessage(ServerMessage.ServerMessageType.ERROR,
+                        "Error: not a valid incoming server message"));
+            }
+            if (msg!=null) {
+                messageHandler.notify(msg);
+            }
+        } catch (Exception e) {
+            messageHandler.notify(new ErrorMessage(ServerMessage.ServerMessageType.ERROR,
+                    "Error: unable to process incoming message"));
         }
     }
 

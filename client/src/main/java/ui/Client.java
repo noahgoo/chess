@@ -36,7 +36,8 @@ public class Client implements MessageHandler {
     private static String playerColor = "";
     private ChessGame board;
     int currentGameID;
-    private static final Logger logger = Logger.getLogger(Client.class.getName());
+    Help printHelp = new Help();
+    private static final Logger LOGGER = Logger.getLogger(Client.class.getName());
 
     public static void main(String[] args) {
         //var serverUrl = "http://localhost:8080";
@@ -111,12 +112,7 @@ public class Client implements MessageHandler {
                     }
                     break;
                 case "3":
-                    out.println(""" 
-                            This is the Chess Pre-Login Menu!
-                            Enter "1" to register a new user with a given USERNAME, PASSWORD, and EMAIL
-                            Enter "2" to login an existing user with a given USERNAME and PASSWORD
-                            Enter "4" to quit
-                            """);
+                    printHelp.printPreHelp(out);
                     break;
                 case "4":
                     System.exit(0);
@@ -218,7 +214,6 @@ public class Client implements MessageHandler {
                 response = scanner.next();
                 clearScanner(scanner);
             }
-
             switch (response) {
                 case "1":
                     CreateGameRequest createGameRequest = getCreateRequest(out, scanner);
@@ -284,15 +279,7 @@ public class Client implements MessageHandler {
                     }
                     break;
                 case "6":
-                    out.println(""" 
-                            This is the Chess Menu!
-                            Enter "1" to create a new game with given GAMENAME
-                            Enter "2" to list all existing games
-                            Enter "3" to join a game with a given GAMEID
-                            Enter "4" to observe a game with a given GAMEID
-                            Enter "5" to logout
-                            Enter "7" to quit
-                            """);
+                    printHelp.printChessMenuHelp(out);
                     break;
                 case "7":
                     quit = true;
@@ -301,7 +288,7 @@ public class Client implements MessageHandler {
         }
     }
 
-    private static void delay(int millis) {
+    private void delay(int millis) {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
@@ -331,15 +318,7 @@ public class Client implements MessageHandler {
 
             switch (response) {
                 case "1":
-                    // help
-                    out.println("""
-                            This is the Game Menu!
-                            Enter "2" to redraw the Chessboard on your screen.
-                            Enter "3" to leave the game.
-                            Enter "4" to make a move with a piece.
-                            Enter "5" to resign and lose the game.
-                            Enter "6" to highlight legal moves for a piece.
-                            """);
+                    printHelp.printGameHelp(out);
                     break;
                 case "2":
                     // redraw the chessboard
