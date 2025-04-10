@@ -153,20 +153,23 @@ public class WebSocketHandler extends Handler {
         connections.broadcast(command, notificationMessage, false);
         // 5. if results in check, checkmate, or stalemate a NOTIFICATION is sent to all clients
         String gameMessage = null;
-        if (game.isInCheckmate(TeamColor.WHITE)) {
-            gameMessage = String.format("Player [%s] is in Checkmate", gameData.whiteUsername());
-        } else if (game.isInCheckmate(TeamColor.BLACK)) {
-            gameMessage = String.format("Player [%s] is in Checkmate", gameData.blackUsername());
-        } else if (game.isInStalemate(TeamColor.WHITE)) {
-            gameMessage = String.format("Player [%s] is in Stalemate", gameData.whiteUsername());
-        } else if (game.isInStalemate(TeamColor.BLACK)) {
-            gameMessage = String.format("Player [%s] is in Stalemate", gameData.blackUsername());
-        } else if (game.isInCheck(TeamColor.WHITE)) {
-            System.out.println("WHITE in in Check");
-            gameMessage = String.format("Player [%s] is in Check", gameData.whiteUsername());
-        } else if (game.isInCheck(TeamColor.BLACK)) {
-            System.out.println("BLACK in in Check");
-            gameMessage = String.format("Player [%s] is in Check", gameData.blackUsername());
+        if (game.isInCheck(TeamColor.BLACK)) {
+            if (game.isInCheckmate(TeamColor.BLACK)) {
+                gameMessage = String.format("Player [%s] is in Checkmate", gameData.blackUsername());
+            } else if (game.isInStalemate(TeamColor.BLACK)) {
+                gameMessage = String.format("Player [%s] is in Stalemate", gameData.blackUsername());
+            } else {
+                gameMessage = String.format("Player [%s] is in Check", gameData.blackUsername());
+            }
+        }
+        if (game.isInCheck(TeamColor.WHITE)) {
+            if (game.isInCheckmate(TeamColor.WHITE)) {
+                gameMessage = String.format("Player [%s] is in Checkmate", gameData.whiteUsername());
+            } else if (game.isInStalemate(TeamColor.WHITE)) {
+                gameMessage = String.format("Player [%s] is in Stalemate", gameData.whiteUsername());
+            } else {
+                gameMessage = String.format("Player [%s] is in Check", gameData.whiteUsername());
+            }
         }
         if (gameMessage!=null) {
             System.out.printf("This is the gameMessage: %s", gameMessage);
@@ -280,6 +283,6 @@ public class WebSocketHandler extends Handler {
         int col = position.getColumn();
         int row = position.getRow();
         char colLetter = (char) ('a' + col - 1);
-        return String.format("[%s, %s]", row, colLetter);
+        return String.format("[%s%s]", colLetter, row);
     }
 }

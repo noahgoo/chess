@@ -159,7 +159,7 @@ public class Client implements MessageHandler {
         out.println("Please provide <PLAYERCOLOR> <GAMEID>");
         out.print(">> ");
         if (scanner.hasNext()) {
-            String playerColor = scanner.next();
+            String playerColor = scanner.next().toUpperCase();
             if (scanner.hasNextInt()) {
                 int id = scanner.nextInt();
                 scanner.nextLine();
@@ -407,10 +407,10 @@ public class Client implements MessageHandler {
     }
 
     private ChessMove getMoveRequest(PrintStream out, Scanner scanner) {
-        int startRow = askRow(out, scanner, "starting");
         int startCol = askColumn(out, scanner, "starting");
-        int endRow = askRow(out, scanner, "ending");
+        int startRow = askRow(out, scanner, "starting");
         int endCol = askColumn(out, scanner, "ending");
+        int endRow = askRow(out, scanner, "ending");
         scanner.nextLine();
         ChessPiece.PieceType promotionPiece = askPromotionPiece(out, scanner);
 

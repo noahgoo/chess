@@ -21,6 +21,24 @@ public class MakeMoveTests {
     }
 
     @Test
+    @DisplayName("Is In Check")
+    public void checkForCheck() throws InvalidMoveException {
+        game.setBoard(TestUtilities.loadBoard("""
+                | | | | | | | | |
+                | | | | | | | |k|
+                | | | | | | | | |
+                | | | | | | | | |
+                | | | | | | | | |
+                | | | | | | | | |
+                |p| | | | | | | |
+                | |K| | | | | | |
+                """
+        ));
+        game.setTeamTurn(ChessGame.TeamColor.WHITE);
+        Assertions.assertTrue(game.isInCheck(ChessGame.TeamColor.WHITE));
+    }
+
+    @Test
     @DisplayName("Make Valid King Move")
     public void makeValidKingMove() throws InvalidMoveException {
         game.setBoard(TestUtilities.loadBoard("""
