@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class SQLGameDAO extends DAO implements GameDAO {
-    private static int gameIds = 0;
 
     public SQLGameDAO() {
         String[] gameStatements = {
@@ -29,6 +28,22 @@ public class SQLGameDAO extends DAO implements GameDAO {
             """
         };
         configureDB(gameStatements);
+
+    }
+
+    public int getMaxGameID() throws DataAccessException {
+        String statement = "SELECT MAX(gameID) FROM game";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(statement);
+             var rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);  // Get the maximum gameID from the result
+            } else {
+                return 0;  // If no games exist, return 0 (or start from 1)
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error retrieving the max gameID");
+        }
     }
 
     @Override
@@ -36,9 +51,9 @@ public class SQLGameDAO extends DAO implements GameDAO {
         String statement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
         ChessGame newChessGame = new ChessGame();
         var jsonChess = new Gson().toJson(newChessGame);
-        gameIds += 1;
-        executeUpdate(statement, gameIds, null, null, gameName, jsonChess);
-        return gameIds;
+        int gameID = getMaxGameID() + 1;
+        executeUpdate(statement, gameID, null, null, gameName, jsonChess);
+        return gameID;
     }
 
     @Override

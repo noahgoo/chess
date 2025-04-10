@@ -127,6 +127,7 @@ public class ChessGame {
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));
                 if (piece!=null&&piece.getTeamColor()!=teamColor) {
                     if (kingInCheck(piece, kingPosition, row, col)) {
+                        System.out.println("Found a check in isInCheck");
                         return true;
                     }
                 }
@@ -140,6 +141,7 @@ public class ChessGame {
         Collection<ChessMove> potentialMoves = piece.pieceMoves(board, new ChessPosition(row,col));
         for (ChessMove move: potentialMoves) {
             if (move.getEndPosition().equals(kingPosition)) {
+                System.out.println("piece can move on King in kingInCheck");
                 return true;
             }
         }
