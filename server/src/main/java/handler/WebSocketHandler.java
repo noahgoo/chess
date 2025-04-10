@@ -2,6 +2,7 @@ package handler;
 
 import chess.ChessGame;
 import chess.ChessGame.TeamColor;
+import chess.ChessPosition;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
 
@@ -53,13 +54,16 @@ public class WebSocketHandler extends Handler {
             return;
         }
         connections.add(command, session, authData.username());
+        String playerColor = "";
         try {
             game = getGame(command.getGameID()).game();
+            playerColor = getPlayerColor(authData, getGame(command.getGameID()));
         } catch (DataAccessException e) {
             connections.sendError(command, "Error: bad gameID", authData.username());
             return;
         }
-        String message = String.format("%s has connected to the game", authData.username());
+
+        String message = String.format("%s has connected to the game as [%s]", authData.username(), playerColor);
         NotificationMessage notificationMessage = new NotificationMessage(ServerMessageType.NOTIFICATION, message);
         connections.broadcast(command, notificationMessage, false);
         LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessageType.LOAD_GAME, game);
@@ -76,9 +80,7 @@ public class WebSocketHandler extends Handler {
     }
 
     private void makeMove(MakeMoveCommand command, Session session) throws IOException {
-//        System.out.println("we in make move now");
         AuthData authData = getAuthData(command, session);
-//        System.out.println("yo checked the auth??");
         if (authData == null) {
             return;
         }
@@ -90,10 +92,14 @@ public class WebSocketHandler extends Handler {
             gameData = getGame(command.getGameID());
             game = gameData.game();
             if (checkObserver(authData, gameData)) {
-                connections.sendError(command, "Observer can't make move", authData.username());
+                connections.sendError(command, "Error: Observer can't make move", authData.username());
                 return;
             }
             color = game.getTeamTurn();
+            if (!checkIsTurn(authData, gameData, color)) {
+                connections.sendError(command, "Error: Not your turn", authData.username());
+                return;
+            }
             var startMove = command.getMove().getStartPosition();
             var validMoves = game.validMoves(startMove);
             boolean valid = false;
@@ -118,7 +124,7 @@ public class WebSocketHandler extends Handler {
                 connections.sendError(command, "Error: not a valid move", authData.username());
                 return;
             } else if (game.resign) {
-                connections.sendError(command, "Error: player has resigned, game is already over", authData.username());
+                connections.sendError(command, "Error: game is already over", authData.username());
                 return;
             }
         } catch (DataAccessException e) {
@@ -140,26 +146,30 @@ public class WebSocketHandler extends Handler {
         LoadGameMessage loadMessage = new LoadGameMessage(ServerMessageType.LOAD_GAME, game);
         connections.broadcast(command, loadMessage, true);
         // 4. send NOTIFICATION to all other clients to say what move happened
-        String message = String.format("Move made by %s from %s to %s%n", authData.username(),
-                command.getMove().getStartPosition(), command.getMove().getEndPosition());
+        String start = getMoveString(command.getMove().getStartPosition());
+        String end = getMoveString(command.getMove().getEndPosition());
+        String message = String.format("Move made by %s from %s to %s%n", authData.username(), start, end);
         NotificationMessage notificationMessage = new NotificationMessage(ServerMessageType.NOTIFICATION, message);
         connections.broadcast(command, notificationMessage, false);
         // 5. if results in check, checkmate, or stalemate a NOTIFICATION is sent to all clients
         String gameMessage = null;
         if (game.isInCheckmate(TeamColor.WHITE)) {
-            gameMessage = String.format("%s is in Checkmate", gameData.whiteUsername());
-        } else if (game.isInCheck(TeamColor.WHITE)) {
-            gameMessage = String.format("%s is in Check", gameData.whiteUsername());
-        } else if (game.isInStalemate(TeamColor.WHITE)) {
-            gameMessage = String.format("%s is in Stalemate", gameData.whiteUsername());
+            gameMessage = String.format("Player [%s] is in Checkmate", gameData.whiteUsername());
         } else if (game.isInCheckmate(TeamColor.BLACK)) {
-            gameMessage = String.format("%s is in Checkmate", gameData.blackUsername());
-        } else if (game.isInCheck(TeamColor.BLACK)) {
-            gameMessage = String.format("%s is in Check", gameData.blackUsername());
+            gameMessage = String.format("Player [%s] is in Checkmate", gameData.blackUsername());
+        } else if (game.isInStalemate(TeamColor.WHITE)) {
+            gameMessage = String.format("Player [%s] is in Stalemate", gameData.whiteUsername());
         } else if (game.isInStalemate(TeamColor.BLACK)) {
-            gameMessage = String.format("%s is in Stalemate", gameData.blackUsername());
+            gameMessage = String.format("Player [%s] is in Stalemate", gameData.blackUsername());
+        } else if (game.isInCheck(TeamColor.WHITE)) {
+            System.out.println("WHITE in in Check");
+            gameMessage = String.format("Player [%s] is in Check", gameData.whiteUsername());
+        } else if (game.isInCheck(TeamColor.BLACK)) {
+            System.out.println("BLACK in in Check");
+            gameMessage = String.format("Player [%s] is in Check", gameData.blackUsername());
         }
         if (gameMessage!=null) {
+            System.out.printf("This is the gameMessage: %s", gameMessage);
             NotificationMessage checkNotification = new NotificationMessage(ServerMessageType.NOTIFICATION, gameMessage);
             connections.broadcast(command, checkNotification, true);
         }
@@ -249,5 +259,27 @@ public class WebSocketHandler extends Handler {
         if (data.whiteUsername()!=null&&authData.username().equals(data.whiteUsername())) {
             return false;
         } else return data.blackUsername() == null || !authData.username().equals(data.blackUsername());
+    }
+
+    private String getPlayerColor(AuthData authData, GameData data) {
+        if (data.whiteUsername()!=null&&authData.username().equals(data.whiteUsername())) {
+            return "WHITE player";
+        } else if (data.blackUsername()!=null&&authData.username().equals(data.blackUsername())) {
+            return "BLACK player";
+        }
+        return "OBSERVER";
+    }
+
+    private boolean checkIsTurn(AuthData authData, GameData data, TeamColor color) {
+        if (data.whiteUsername()!=null&&authData.username().equals(data.whiteUsername())&&color.equals(TeamColor.WHITE)) {
+            return true;
+        } else return data.blackUsername() != null && authData.username().equals(data.blackUsername()) && color.equals(TeamColor.BLACK);
+    }
+
+    private String getMoveString(ChessPosition position) {
+        int col = position.getColumn();
+        int row = position.getRow();
+        char colLetter = (char) ('a' + col - 1);
+        return String.format("[%s, %s]", row, colLetter);
     }
 }

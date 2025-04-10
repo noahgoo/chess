@@ -2,6 +2,7 @@ package ui;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import exception.ResponseException;
 import model.GameData;
@@ -47,6 +48,7 @@ public class Client implements MessageHandler {
     }
 
     private void start(String serverUrl) {
+        System.out.println("Welcome to Noah's Chess Server\n");
         serverFacade = new ServerFacade(serverUrl);
         messageHandler = this;
         displayPreLoginUI();
@@ -363,6 +365,10 @@ public class Client implements MessageHandler {
                     break;
                 case "4":
                     ChessMove playerMove = getMoveRequest(out, scanner);
+                    if (playerMove.getPromotionPiece()!=null&&!checkValidPromotion(playerMove.getStartPosition(), playerMove.getEndPosition())) {
+                        out.println("Error: not a valid promotion");
+                        break;
+                    }
                     try {
                         wsf.makeMove(authToken, gameID, playerMove);
                     } catch (ResponseException e) {
@@ -405,27 +411,65 @@ public class Client implements MessageHandler {
         int startCol = askColumn(out, scanner, "starting");
         int endRow = askRow(out, scanner, "ending");
         int endCol = askColumn(out, scanner, "ending");
+        scanner.nextLine();
+        ChessPiece.PieceType promotionPiece = askPromotionPiece(out, scanner);
+
 
         ChessPosition start = new ChessPosition(startRow, startCol);
         ChessPosition end = new ChessPosition(endRow, endCol);
-        return new ChessMove(start, end, null);
+        return new ChessMove(start, end, promotionPiece);
     }
 
-    private static int askRow(PrintStream out, Scanner scanner, String label) {
+    private boolean checkValidPromotion(ChessPosition start, ChessPosition end) {
+        chess.ChessBoard chessBoard = board.getBoard();
+        if (chessBoard.getPiece(start)!=null) {
+            ChessPiece startPiece = chessBoard.getPiece(start);
+            if (startPiece.getPieceType().equals(ChessPiece.PieceType.PAWN)
+                    &&startPiece.getTeamColor().toString().equals(playerColor)) {
+                if (playerColor.equals("WHITE")&&end.getRow()==8) {
+                    return true;
+                } else return playerColor.equals("BLACK") && end.getRow() == 1;
+            }
+        }
+        return false;
+    }
+
+    private ChessPiece.PieceType askPromotionPiece(PrintStream out, Scanner scanner) {
+        out.println("If you are moving your pawn and it can be promoted please enter the following:");
+        out.println("Enter 'q' for Queen, 'r' for Rook, 'b' for Bishop, or 'n' for Knight:");
+        out.println("Other press ENTER to to skip!");
+
+        while (true) {
+            String input = scanner.nextLine().trim().toLowerCase();
+            if (input.isEmpty()) {
+                return null;
+            }
+
+            switch (input) {
+                case "q" -> { return ChessPiece.PieceType.QUEEN; }
+                case "r" -> { return ChessPiece.PieceType.ROOK; }
+                case "b" -> { return ChessPiece.PieceType.BISHOP; }
+                case "n" -> { return ChessPiece.PieceType.KNIGHT; }
+                default -> out.println("Invalid input. Press ENTER to skip promotion or please enter 'q', 'r', 'b', or 'n':");
+            }
+        }
+    }
+
+    private int askRow(PrintStream out, Scanner scanner, String label) {
         int row = -1;
         while (row < 1 || row > 8) {
             out.printf("Enter the %s row (1-8): ", label);
             if (scanner.hasNextInt()) {
                 row = scanner.nextInt();
             } else {
-                scanner.next(); // discard invalid input
+                scanner.next();
                 out.println("Error: Invalid input. Please enter a number from 1 to 8.");
             }
         }
         return row;
     }
 
-    private static int askColumn(PrintStream out, Scanner scanner, String label) {
+    private int askColumn(PrintStream out, Scanner scanner, String label) {
         String input = "";
         char colChar;
         while (true) {
@@ -448,7 +492,7 @@ public class Client implements MessageHandler {
     }
 
     private void displayNotification(String msg) {
-        System.out.println(msg);
+        System.out.printf("%n%s%n", msg);
     }
 
     @Override
@@ -460,7 +504,7 @@ public class Client implements MessageHandler {
                 LoadGameMessage load = (LoadGameMessage) serverMessage;
                 displayChessBoard(load.getGame(), null);
                 board = load.getGame();
-                logger.warning("Received and displayed ChessGame");
+                // logger.warning("Received and displayed ChessGame");
             }
         }
     }

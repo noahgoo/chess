@@ -94,12 +94,13 @@ public class ChessGame {
         if (board.getPiece(move.getStartPosition())!=null&&validMoves.contains(move)
                 &&teamTurn.equals(board.getPiece(move.getStartPosition()).getTeamColor())) {
             ChessPiece piece = board.getPiece(move.getStartPosition());
-            board.addPiece(move.getEndPosition(), piece);
-            board.addPiece(move.getStartPosition(), null);
             // check for promotion piece
             if (move.getPromotionPiece()!=null) {
                 board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
+            } else {
+                board.addPiece(move.getEndPosition(), piece);
             }
+            board.addPiece(move.getStartPosition(), null);
             // set team turn
             if (piece.getTeamColor().equals(TeamColor.WHITE)) {
                 setTeamTurn(TeamColor.BLACK);

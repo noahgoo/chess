@@ -17,12 +17,14 @@ public class SQLGameDAO extends DAO implements GameDAO {
         String[] gameStatements = {
                 """
             CREATE TABLE IF NOT EXISTS game (
+                id INT NOT NULL AUTO_INCREMENT,
                 gameID INT NOT NULL,
                 whiteUsername VARCHAR(255),
                 blackUsername VARCHAR(255),
                 gameName VARCHAR(255) NOT NULL,
                 game JSON NOT NULL,
-                PRIMARY KEY (gameID)
+                PRIMARY KEY (id),
+                UNIQUE (gameID)
             );
             """
         };

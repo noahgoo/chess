@@ -51,6 +51,8 @@ public class DAO {
                 return 0;
             }
         } catch (SQLException | DataAccessException e) {
+            System.out.println("this is the real error");
+            System.out.println(e.getMessage());
             throw new DataAccessException("Error: unable to update database");
         }
     }

@@ -125,8 +125,10 @@ public class ChessBoard {
     private static Collection<ChessPosition> getValidPositions(ChessPosition position) {
         Collection<ChessPosition> validPositions = new ArrayList<>();
         Collection<ChessMove> validMoves = game.validMoves(position);
-        for (var move: validMoves) {
-            validPositions.add(move.getEndPosition());
+        if (validMoves!=null) {
+            for (var move : validMoves) {
+                validPositions.add(move.getEndPosition());
+            }
         }
         return validPositions;
     }
