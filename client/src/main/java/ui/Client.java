@@ -33,7 +33,6 @@ public class Client implements MessageHandler {
     private static WebSocketFacade wsf;
     private static String serverUrl = "http://localhost:8080";
     private static MessageHandler messageHandler;
-    private static String username;
     private static String playerColor = "";
     private ChessGame board;
     int currentGameID;
@@ -76,6 +75,7 @@ public class Client implements MessageHandler {
                 clearScanner(scanner);
             }
 
+            String username;
             switch (response) {
                 case "1":
                     RegisterRequest registerRequest = getRegisterRequest(out, scanner);
@@ -104,7 +104,6 @@ public class Client implements MessageHandler {
                         LoginResult loginResult = serverFacade.login(loginRequest);
                         out.println("Logged in as " + loginResult.username() + "\n");
                         authToken = loginResult.authToken();
-                        username = loginResult.username();
                         displayPostLoginUI(out, scanner);
                     } catch (ResponseException e) {
                         out.println("Error: could not process Login request\n");
@@ -470,7 +469,7 @@ public class Client implements MessageHandler {
     }
 
     private int askColumn(PrintStream out, Scanner scanner, String label) {
-        String input = "";
+        String input;
         char colChar;
         while (true) {
             out.printf("Enter the %s column (a-h): ", label);

@@ -167,19 +167,11 @@ public class ChessBoard {
     }
 
     private static void drawLightBrownSquare(PrintStream out, String teamColor, String piece, String highlight) {
-        if (highlight!=null) {
-            printPiece(out, highlight, teamColor, piece);
-        } else {
-            printPiece(out, SET_BG_COLOR_LIGHT_BROWN, teamColor, piece);
-        }
+        printPiece(out, Objects.requireNonNullElse(highlight, SET_BG_COLOR_LIGHT_BROWN), teamColor, piece);
     }
 
     private static void drawBrownSquare(PrintStream out, String teamColor, String piece, String highlight) {
-        if (highlight!=null) {
-            printPiece(out, highlight, teamColor, piece);
-        } else {
-            printPiece(out, SET_BG_COLOR_BROWN, teamColor, piece);
-        }
+        printPiece(out, Objects.requireNonNullElse(highlight, SET_BG_COLOR_BROWN), teamColor, piece);
     }
 
     private static void drawEdgeSquare(PrintStream out, int rowNumber) {

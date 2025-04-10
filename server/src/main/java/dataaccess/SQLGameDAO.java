@@ -8,7 +8,6 @@ import model.GameData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class SQLGameDAO extends DAO implements GameDAO {
 

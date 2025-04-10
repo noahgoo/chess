@@ -10,19 +10,14 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import service.GameService;
 import service.Service;
-import spark.Request;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
-import websocket.commands.UserGameCommand.CommandType.*;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
 import websocket.messages.ServerMessage.ServerMessageType;
 
 import java.io.IOException;
@@ -54,7 +49,7 @@ public class WebSocketHandler extends Handler {
             return;
         }
         connections.add(command, session, authData.username());
-        String playerColor = "";
+        String playerColor;
         try {
             game = getGame(command.getGameID()).game();
             playerColor = getPlayerColor(authData, getGame(command.getGameID()));
