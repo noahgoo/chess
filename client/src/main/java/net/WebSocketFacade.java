@@ -29,8 +29,12 @@ public class WebSocketFacade extends Endpoint {
             URI socketURI = new URI(url + "/ws");
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
-            // handle message here
-            this.session.addMessageHandler((MessageHandler.Whole<String>) this::handleMessage);
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                public void onMessage(String message) {
+                    // handle message here
+                    handleMessage(message);
+                }
+            });
         } catch (URISyntaxException | DeploymentException | IOException e) {
             throw new ResponseException(500, "WebSocket error: " + e.getClass().getSimpleName() + " - " + e.getMessage());
 
