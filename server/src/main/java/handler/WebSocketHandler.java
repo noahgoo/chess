@@ -89,6 +89,10 @@ public class WebSocketHandler extends Handler {
         try {
             gameData = getGame(command.getGameID());
             game = gameData.game();
+            if (checkObserver(authData, gameData)) {
+                connections.sendError(command, "Observer can't make move", authData.username());
+                return;
+            }
             color = game.getTeamTurn();
             var startMove = command.getMove().getStartPosition();
             var validMoves = game.validMoves(startMove);
@@ -239,5 +243,11 @@ public class WebSocketHandler extends Handler {
         } else if (gameData.blackUsername()!=null&&gameData.blackUsername().equals(authData.username())) {
             Service.GAME_DAO.updateGame("BLACK", gameData, authData);
         }
+    }
+
+    private boolean checkObserver(AuthData authData, GameData data) {
+        if (data.whiteUsername()!=null&&authData.username().equals(data.whiteUsername())) {
+            return false;
+        } else return data.blackUsername() == null || !authData.username().equals(data.blackUsername());
     }
 }
