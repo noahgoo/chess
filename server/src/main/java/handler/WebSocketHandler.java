@@ -93,17 +93,22 @@ public class WebSocketHandler extends Handler {
             var startMove = command.getMove().getStartPosition();
             var validMoves = game.validMoves(startMove);
             boolean valid = false;
-            for (var move: validMoves) {
-                var boardPiece = game.getBoard().getPiece(startMove);
-                if (move.getEndPosition().equals(command.getMove().getEndPosition())&&color.equals(boardPiece.getTeamColor())) {
-                    if (color.equals(TeamColor.WHITE)&&(gameData.whiteUsername().equals(authData.username()))) {
-                        valid = true;
-                        break;
-                    } else if (color.equals(TeamColor.BLACK)&&(gameData.blackUsername().equals(authData.username()))) {
-                        valid = true;
-                        break;
+            if (validMoves!=null) {
+                for (var move: validMoves) {
+                    var boardPiece = game.getBoard().getPiece(startMove);
+                    if (move.getEndPosition().equals(command.getMove().getEndPosition())&&color.equals(boardPiece.getTeamColor())) {
+                        if (color.equals(TeamColor.WHITE)&&(gameData.whiteUsername().equals(authData.username()))) {
+                            valid = true;
+                            break;
+                        } else if (color.equals(TeamColor.BLACK)&&(gameData.blackUsername().equals(authData.username()))) {
+                            valid = true;
+                            break;
+                        }
                     }
                 }
+            } else {
+                connections.sendError(command, "Error: no piece in starting position", authData.username());
+                return;
             }
             if (!valid) {
                 connections.sendError(command, "Error: not a valid move", authData.username());

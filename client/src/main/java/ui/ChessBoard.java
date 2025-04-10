@@ -1,11 +1,14 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Objects;
 
 import static ui.EscapeSequences.*;
@@ -14,10 +17,15 @@ public class ChessBoard {
     private static final int BOARD_SIZE_IN_SQUARES = 8;
     private static final String EMPTY = "   ";
     private static boolean flip;
+    private static ChessGame game;
+    private static ChessPosition highlightPosition;
 
-    public static void drawChessBoard(chess.ChessBoard board, boolean flip) {
+    public static void drawChessBoard(ChessGame importedGame, boolean flip, ChessPosition position) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         ChessBoard.flip = flip;
+        game = importedGame;
+        highlightPosition = position;
+        chess.ChessBoard board = game.getBoard();
         out.print(ERASE_SCREEN);
         out.println();
 
@@ -83,18 +91,28 @@ public class ChessBoard {
             ChessPosition position = new ChessPosition(rowNumber, column);
             String piece = determinePiece(board, position);
             String color = determineColor(board, position);
+            String highlight = null;
+
+            if (highlightPosition!=null) {
+                Collection<ChessPosition> positions = getValidPositions(highlightPosition);
+                if (position.equals(highlightPosition)) {
+                    highlight = SET_BG_COLOR_HIGHLIGHT_RED;
+                } else if (positions.contains(position)) {
+                    highlight = SET_BG_COLOR_LIGHT_GREEN;
+                }
+            }
 
             if (flag) {
                 if (col % 2 > 0) {
-                    drawLightBrownSquare(out, color, piece);
+                    drawLightBrownSquare(out, color, piece, highlight);
                 } else {
-                    drawBrownSquare(out, color, piece);
+                    drawBrownSquare(out, color, piece, highlight);
                 }
             } else {
                 if (col % 2 > 0) {
-                    drawBrownSquare(out, color, piece);
+                    drawBrownSquare(out, color, piece, highlight);
                 } else {
-                    drawLightBrownSquare(out, color, piece);
+                    drawLightBrownSquare(out, color, piece, highlight);
                 }
             }
         }
@@ -102,6 +120,15 @@ public class ChessBoard {
         drawEdgeSquare(out, rowNumber);
         setDefault(out);
         out.println();
+    }
+
+    private static Collection<ChessPosition> getValidPositions(ChessPosition position) {
+        Collection<ChessPosition> validPositions = new ArrayList<>();
+        Collection<ChessMove> validMoves = game.validMoves(position);
+        for (var move: validMoves) {
+            validPositions.add(move.getEndPosition());
+        }
+        return validPositions;
     }
 
     private static String determinePiece(chess.ChessBoard board, ChessPosition position) {
@@ -137,12 +164,20 @@ public class ChessBoard {
         return null;
     }
 
-    private static void drawLightBrownSquare(PrintStream out, String teamColor, String piece) {
-        printPiece(out, SET_BG_COLOR_LIGHT_BROWN, teamColor, piece);
+    private static void drawLightBrownSquare(PrintStream out, String teamColor, String piece, String highlight) {
+        if (highlight!=null) {
+            printPiece(out, highlight, teamColor, piece);
+        } else {
+            printPiece(out, SET_BG_COLOR_LIGHT_BROWN, teamColor, piece);
+        }
     }
 
-    private static void drawBrownSquare(PrintStream out, String teamColor, String piece) {
-        printPiece(out, SET_BG_COLOR_BROWN, teamColor, piece);
+    private static void drawBrownSquare(PrintStream out, String teamColor, String piece, String highlight) {
+        if (highlight!=null) {
+            printPiece(out, highlight, teamColor, piece);
+        } else {
+            printPiece(out, SET_BG_COLOR_BROWN, teamColor, piece);
+        }
     }
 
     private static void drawEdgeSquare(PrintStream out, int rowNumber) {

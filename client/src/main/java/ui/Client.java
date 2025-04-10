@@ -1,6 +1,8 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import exception.ResponseException;
 import model.GameData;
 import net.MessageHandler;
@@ -11,6 +13,7 @@ import request.JoinGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
 import result.*;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -19,24 +22,33 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 // has the menu
 public class Client implements MessageHandler {
     static boolean quit = false;
     static String authToken;
     static ServerFacade serverFacade;
-    private WebSocketFacade wsf;
+    private static WebSocketFacade wsf;
     private static String serverUrl = "http://localhost:8080";
     private static MessageHandler messageHandler;
     private static String username;
-    private static String playerColor;
+    private static String playerColor = "";
+    private ChessGame board;
+    int currentGameID;
+    private static final Logger logger = Logger.getLogger(Client.class.getName());
 
     public static void main(String[] args) {
         //var serverUrl = "http://localhost:8080";
         if (args.length == 1) {
             serverUrl = args[0];
         }
+        new Client().start(serverUrl);
+    }
+
+    private void start(String serverUrl) {
         serverFacade = new ServerFacade(serverUrl);
+        messageHandler = this;
         displayPreLoginUI();
     }
 
@@ -53,17 +65,13 @@ public class Client implements MessageHandler {
             out.print(">> ");
 
             String response = scanner.next();
-            if (scanner.hasNextLine()) {
-                scanner.nextLine();
-            }
+            clearScanner(scanner);
             // check response is valid and if not ask again
             String[] validResponses = {"1", "2", "3", "4"};
             while (!Arrays.asList(validResponses).contains(response)) {
                 out.print("Not a valid option, please try again: ");
                 response = scanner.next();
-                if (scanner.hasNextLine()) {
-                    scanner.nextLine();
-                }
+                clearScanner(scanner);
             }
 
             switch (response) {
@@ -174,36 +182,23 @@ public class Client implements MessageHandler {
         out.println();
     }
 
-    private void displayChessBoard(ChessGame game) {
-//        ChessGame currentGame = null;
-//        for (GameData game: listResult.games()) {
-//            if (game.gameID()==joinRequest.gameID()) {
-//                currentGame = game.game();
-//            }
-//        }
+    private void displayChessBoard(ChessGame game, ChessPosition highlightPosition) {
         if (game!=null&&(playerColor.isEmpty()||playerColor.equals("WHITE"))) {
-            ChessBoard.drawChessBoard(game.getBoard(), false);
+            ChessBoard.drawChessBoard(game, false, highlightPosition);
         } else if (game!=null&&playerColor.equals("BLACK")) {
-            ChessBoard.drawChessBoard(game.getBoard(), true);
+            ChessBoard.drawChessBoard(game, true, highlightPosition);
         } else {
             System.out.println("Error: no game found");
         }
-//        if (game!=null&&joinRequest.playerColor().equals("WHITE")) {
-//            ChessBoard.drawChessBoard(game.getBoard(), false);
-//        } else if (game!=null&&joinRequest.playerColor().equals("BLACK")) {
-//            ChessBoard.drawChessBoard(game.getBoard(), true);
-//        } else {
-//            throw new ResponseException(400, "Error: no game found");
-//        }
-
     }
 
     private void initiateWSF(String url) throws ResponseException {
-        wsf = new WebSocketFacade(Client.this, url);
+        wsf = new WebSocketFacade(url, messageHandler);
     }
 
     private void displayPostLoginUI(PrintStream out, Scanner scanner) {
         while (true) {
+            // clearScanner(scanner);
             out.println("[Logged In]");
             out.println("\t1. Create Game");
             out.println("\t2. List Games");
@@ -215,16 +210,12 @@ public class Client implements MessageHandler {
             out.print(">> ");
 
             String response = scanner.next();
-            if (scanner.hasNextLine()) {
-                scanner.nextLine();
-            }
+            clearScanner(scanner);
             String[] validResponses = {"1", "2", "3", "4", "5", "6", "7"};
             while (!Arrays.asList(validResponses).contains(response)) {
                 out.print("Not a valid option, please try again: ");
                 response = scanner.next();
-                if (scanner.hasNextLine()) {
-                    scanner.nextLine();
-                }
+                clearScanner(scanner);
             }
 
             switch (response) {
@@ -252,18 +243,14 @@ public class Client implements MessageHandler {
                         break;
                     }
                     try {
-                        // Call the server join HTTP API to join them to the game. This step is only done for players. Observers do not need to make the join HTTP API request.
-                        //Open a WebSocket connection with the server (using the /ws endpoint) so it can send and receive gameplay messages.
-                        //Send a CONNECT WebSocket message to the server.
-                        //Transition to the gameplay UI. The gameplay UI draws the chess board and allows the user to perform the gameplay commands described in the previous section.
                         serverFacade.joinGame(joinRequest, authToken);
-                        initiateWSF(serverUrl);
-                        // wsf = new WebSocketFacade(this, serverUrl);
-                        wsf.connect(authToken, joinRequest.gameID(), username);
                         out.println("Successfully joined game " + joinRequest.gameID() + "\n");
+                        initiateWSF(serverUrl);
+                        wsf.connect(authToken, joinRequest.gameID());
                         playerColor = joinRequest.playerColor();
+                        currentGameID = joinRequest.gameID();
+                        delay(250);
                         displayGameUI(out, scanner, joinRequest.gameID());
-                        // displayChessBoard(new ChessGame());
                     } catch (ResponseException e) {
                         out.println(e.getMessage());
                     }
@@ -271,10 +258,16 @@ public class Client implements MessageHandler {
                 case "4":
                     out.print("Please enter GAMEID: ");
                     if (scanner.hasNextInt()) {
-                        int gameid = scanner.nextInt();
-                        JoinGameRequest observeRequest = new JoinGameRequest("WHITE", gameid);
-                        scanner.nextLine();
-                        displayChessBoard(new ChessGame());
+                        currentGameID = scanner.nextInt();
+                        clearScanner(scanner);
+                        try {
+                            initiateWSF(serverUrl);
+                            wsf.connect(authToken, currentGameID);
+                            delay(250);
+                            displayGameUI(out, scanner, currentGameID);
+                        } catch (ResponseException e) {
+                            out.println(e.getMessage());
+                        }
                     } else {
                         out.println("Invalid gameID");
                         break;
@@ -307,28 +300,32 @@ public class Client implements MessageHandler {
         }
     }
 
+    private static void delay(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void displayGameUI(PrintStream out, Scanner scanner, int gameID) {
         while (true) {
             out.println("[IN GAME]");
             out.println("\t1. Help");
-
             out.println("\t2. Redraw Chessboard");
             out.println("\t3. Leave");
             out.println("\t4. Make Move");
             out.println("\t5. Resign");
             out.println("\t6. Highlight Legal Moves");
+            out.print(">> ");
 
             String response = scanner.next();
-            if (scanner.hasNextLine()) {
-                scanner.nextLine();
-            }
+            clearScanner(scanner);
             String[] validResponses = {"1", "2", "3", "4", "5", "6"};
             while (!Arrays.asList(validResponses).contains(response)) {
                 out.print("Not a valid option, please try again: ");
                 response = scanner.next();
-                if (scanner.hasNextLine()) {
-                    scanner.nextLine();
-                }
+                clearScanner(scanner);
             }
 
             switch (response) {
@@ -342,8 +339,11 @@ public class Client implements MessageHandler {
                             Enter "5" to resign and lose the game.
                             Enter "6" to highlight legal moves for a piece.
                             """);
+                    break;
                 case "2":
                     // redraw the chessboard
+                    displayChessBoard(board, null);
+                    break;
                 case "3":
                     // leave
                     out.println("Are you sure you want to leave? (y/n)");
@@ -354,7 +354,7 @@ public class Client implements MessageHandler {
                         out.println("Invalid answer");
                     } else {
                         try {
-                            wsf.leave(authToken, gameID, username);
+                            wsf.leave(authToken, gameID);
                             return;
                         } catch (ResponseException e) {
                             out.println("Unauthorized");
@@ -362,7 +362,13 @@ public class Client implements MessageHandler {
                     }
                     break;
                 case "4":
-                    // make a move
+                    ChessMove playerMove = getMoveRequest(out, scanner);
+                    try {
+                        wsf.makeMove(authToken, gameID, playerMove);
+                    } catch (ResponseException e) {
+                        out.printf("Error: %s%n", e.getMessage());
+                    }
+                    break;
                 case "5":
                     // resign
                     out.println("Are you sure you want to resign? (y/n)");
@@ -373,15 +379,71 @@ public class Client implements MessageHandler {
                         out.println("Invalid answer");
                     } else {
                         try {
-                            wsf.resign(authToken, gameID, username);
+                            wsf.resign(authToken, gameID);
                         } catch (ResponseException e) {
                             out.println("Unauthorized");
                         }
                     }
                     break;
                 case "6":
-                    // highlight legal moves
+                    ChessPosition piecePosition = getHighlightPiece(out, scanner);
+                    displayChessBoard(board, piecePosition);
+                    break;
             }
+            delay(500);
+        }
+    }
+
+    private ChessPosition getHighlightPiece(PrintStream out, Scanner scanner) {
+        int row = askRow(out, scanner, "piece");
+        int col = askColumn(out, scanner, "piece");
+        return new ChessPosition(row, col);
+    }
+
+    private ChessMove getMoveRequest(PrintStream out, Scanner scanner) {
+        int startRow = askRow(out, scanner, "starting");
+        int startCol = askColumn(out, scanner, "starting");
+        int endRow = askRow(out, scanner, "ending");
+        int endCol = askColumn(out, scanner, "ending");
+
+        ChessPosition start = new ChessPosition(startRow, startCol);
+        ChessPosition end = new ChessPosition(endRow, endCol);
+        return new ChessMove(start, end, null);
+    }
+
+    private static int askRow(PrintStream out, Scanner scanner, String label) {
+        int row = -1;
+        while (row < 1 || row > 8) {
+            out.printf("Enter the %s row (1-8): ", label);
+            if (scanner.hasNextInt()) {
+                row = scanner.nextInt();
+            } else {
+                scanner.next(); // discard invalid input
+                out.println("Error: Invalid input. Please enter a number from 1 to 8.");
+            }
+        }
+        return row;
+    }
+
+    private static int askColumn(PrintStream out, Scanner scanner, String label) {
+        String input = "";
+        char colChar;
+        while (true) {
+            out.printf("Enter the %s column (a-h): ", label);
+            input = scanner.next().toLowerCase();
+            if (input.length() == 1) {
+                colChar = input.charAt(0);
+                if (colChar >= 'a' && colChar <= 'h') {
+                    return colChar - 'a' + 1;
+                }
+            }
+            out.println("Error: Invalid input. Please enter a single letter from a to h.");
+        }
+    }
+
+    private void clearScanner(Scanner scanner) {
+        if (scanner.hasNextLine()) {
+            scanner.nextLine();
         }
     }
 
@@ -392,8 +454,14 @@ public class Client implements MessageHandler {
     @Override
     public void notify(ServerMessage serverMessage) {
         switch (serverMessage.getServerMessageType()) {
-            case LOAD_GAME -> displayChessBoard(((LoadGameMessage) serverMessage).getGame());
             case NOTIFICATION -> displayNotification(((NotificationMessage) serverMessage).getNotification());
+            case ERROR -> displayNotification(((ErrorMessage) serverMessage).getError());
+            case LOAD_GAME -> {
+                LoadGameMessage load = (LoadGameMessage) serverMessage;
+                displayChessBoard(load.getGame(), null);
+                board = load.getGame();
+                logger.warning("Received and displayed ChessGame");
+            }
         }
     }
 }
