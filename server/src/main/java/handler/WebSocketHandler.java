@@ -164,7 +164,8 @@ public class WebSocketHandler extends Handler {
         }
     }
 
-    private boolean isValid(MakeMoveCommand command, Collection<ChessMove> validMoves, ChessGame game, ChessPosition startMove, TeamColor color, GameData gameData, AuthData authData, boolean valid) {
+    private boolean isValid(MakeMoveCommand command, Collection<ChessMove> validMoves, ChessGame game, ChessPosition startMove,
+                            TeamColor color, GameData gameData, AuthData authData, boolean valid) {
         for (var move: validMoves) {
             var boardPiece = game.getBoard().getPiece(startMove);
             if (move.getEndPosition().equals(command.getMove().getEndPosition())&& color.equals(boardPiece.getTeamColor())) {
@@ -263,7 +264,7 @@ public class WebSocketHandler extends Handler {
     private boolean checkObserver(AuthData authData, GameData data) {
         if (data.whiteUsername()!=null&&authData.username().equals(data.whiteUsername())) {
             return false;
-        } else return data.blackUsername() == null || !authData.username().equals(data.blackUsername());
+        } else { return data.blackUsername() == null || !authData.username().equals(data.blackUsername()); }
     }
 
     private String getPlayerColor(AuthData authData, GameData data) {
@@ -278,7 +279,8 @@ public class WebSocketHandler extends Handler {
     private boolean checkIsTurn(AuthData authData, GameData data, TeamColor color) {
         if (data.whiteUsername()!=null&&authData.username().equals(data.whiteUsername())&&color.equals(TeamColor.WHITE)) {
             return true;
-        } else return data.blackUsername() != null && authData.username().equals(data.blackUsername()) && color.equals(TeamColor.BLACK);
+        } else { return data.blackUsername() != null && authData.username().equals(data.blackUsername())
+                && color.equals(TeamColor.BLACK); }
     }
 
     private String getMoveString(ChessPosition position) {

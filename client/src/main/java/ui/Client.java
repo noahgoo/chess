@@ -406,7 +406,7 @@ public class Client implements MessageHandler {
                     &&startPiece.getTeamColor().toString().equals(playerColor)) {
                 if (playerColor.equals("WHITE")&&end.getRow()==8) {
                     return true;
-                } else return playerColor.equals("BLACK") && end.getRow() == 1;
+                } else { return playerColor.equals("BLACK") && end.getRow() == 1; }
             }
         }
         return false;
