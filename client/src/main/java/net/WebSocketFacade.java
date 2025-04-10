@@ -2,8 +2,12 @@ package net;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import ui.ChessBoard;
+import ui.Client;
 import websocket.commands.UserGameCommand;
 import websocket.commands.UserGameCommand.*;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 import javax.imageio.IIOException;
 import javax.websocket.MessageHandler;
@@ -14,9 +18,10 @@ import java.net.URISyntaxException;
 
 public class WebSocketFacade extends Endpoint {
     Session session;
-    ServerMessage serverMessage;
+    net.MessageHandler messageHandler;
 
-    public WebSocketFacade(String url) throws ResponseException {
+    public WebSocketFacade(net.MessageHandler handler, String url) throws ResponseException {
+        this.messageHandler = handler;
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
@@ -24,7 +29,14 @@ public class WebSocketFacade extends Endpoint {
             this.session = container.connectToServer(this, socketURI);
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 public void onMessage(String message) {
-                    System.out.println(message);
+                    // handle message here
+                    try {
+                        ServerMessage msg = new Gson().fromJson(message, ServerMessage.class);
+                        messageHandler.notify(msg);
+                    } catch (Exception e) {
+                        messageHandler.notify(new ErrorMessage(ServerMessage.ServerMessageType.ERROR,
+                                "Error: unable to process incoming message"));
+                    }
                 }
             });
         } catch (URISyntaxException | DeploymentException | IOException e) {
@@ -35,7 +47,7 @@ public class WebSocketFacade extends Endpoint {
 
     public void connect(String authToken, Integer gameID, String username) throws ResponseException {
         try {
-            var connectCommand = new UserGameCommand(CommandType.CONNECT, authToken, gameID, username);
+            var connectCommand = new UserGameCommand(CommandType.CONNECT, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(connectCommand));
         } catch (IOException e) {
             throw new ResponseException(500, e.getMessage());
@@ -44,7 +56,7 @@ public class WebSocketFacade extends Endpoint {
 
     public void makeMove(String authToken, Integer gameID, String username) throws ResponseException {
         try {
-            var moveCommand = new UserGameCommand(CommandType.MAKE_MOVE, authToken, gameID, username);
+            var moveCommand = new UserGameCommand(CommandType.MAKE_MOVE, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(moveCommand));
         } catch (IOException e) {
             throw new ResponseException(500, e.getMessage());
@@ -53,7 +65,7 @@ public class WebSocketFacade extends Endpoint {
 
     public void leave(String authToken, Integer gameID, String username) throws ResponseException {
         try {
-            var leaveCommand = new UserGameCommand(CommandType.LEAVE, authToken, gameID, username);
+            var leaveCommand = new UserGameCommand(CommandType.LEAVE, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(leaveCommand));
             this.session.close();
         } catch (IOException e) {
@@ -63,7 +75,7 @@ public class WebSocketFacade extends Endpoint {
 
     public void resign(String authToken, Integer gameID, String username) throws ResponseException {
         try {
-            var resignCommand = new UserGameCommand(CommandType.RESIGN, authToken, gameID, username);
+            var resignCommand = new UserGameCommand(CommandType.RESIGN, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(resignCommand));
         } catch (IOException e) {
             throw new ResponseException(500, e.getMessage());

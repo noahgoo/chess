@@ -11,6 +11,8 @@ import request.JoinGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
 import result.*;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.PrintStream;
@@ -19,14 +21,15 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 // has the menu
-public class Client {
+public class Client implements MessageHandler {
     static boolean quit = false;
     static String authToken;
     static ServerFacade serverFacade;
-    private static WebSocketFacade wsf;
+    private WebSocketFacade wsf;
     private static String serverUrl = "http://localhost:8080";
     private static MessageHandler messageHandler;
     private static String username;
+    private static String playerColor;
 
     public static void main(String[] args) {
         //var serverUrl = "http://localhost:8080";
@@ -37,7 +40,7 @@ public class Client {
         displayPreLoginUI();
     }
 
-    private static void displayPreLoginUI() {
+    private void displayPreLoginUI() {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         Scanner scanner = new Scanner(System.in);
         // display pre login menu
@@ -116,7 +119,7 @@ public class Client {
         }
     }
 
-    private static RegisterRequest getRegisterRequest(PrintStream out, Scanner scanner) {
+    private RegisterRequest getRegisterRequest(PrintStream out, Scanner scanner) {
         out.println("\nPlease provide <USERNAME> <PASSWORD> <EMAIL>");
         out.print(">> ");
         String[] responses = scanner.nextLine().split("\\s+");
@@ -126,7 +129,7 @@ public class Client {
         return null;
     }
 
-    private static LoginRequest getLoginRequest(PrintStream out, Scanner scanner) {
+    private LoginRequest getLoginRequest(PrintStream out, Scanner scanner) {
         out.println("\nPlease provide your <USERNAME> <PASSWORD>");
         out.print(">> ");
         String[] response = scanner.nextLine().split("\\s+");
@@ -136,13 +139,13 @@ public class Client {
         return null;
     }
 
-    private static CreateGameRequest getCreateRequest(PrintStream out, Scanner scanner) {
+    private CreateGameRequest getCreateRequest(PrintStream out, Scanner scanner) {
         out.println("Please provide a <GAMENAME>");
         out.print(">> ");
         return new CreateGameRequest(scanner.nextLine());
     }
 
-    private static JoinGameRequest getJoinRequest(PrintStream out, Scanner scanner) {
+    private JoinGameRequest getJoinRequest(PrintStream out, Scanner scanner) {
         out.println("Please provide <PLAYERCOLOR> <GAMEID>");
         out.print(">> ");
         if (scanner.hasNext()) {
@@ -156,7 +159,7 @@ public class Client {
         return null;
     }
 
-    private static void displayGamesList(PrintStream out, ListGameResult listResult) {
+    private void displayGamesList(PrintStream out, ListGameResult listResult) {
         out.println("GAMEID | GAMENAME | WHITEUSER | BLACKUSER");
         for (GameData game: listResult.games()) {
             String builder = game.gameID() +
@@ -171,24 +174,35 @@ public class Client {
         out.println();
     }
 
-    private static void displayChessBoard(ListGameResult listResult, JoinGameRequest joinRequest) throws ResponseException {
-        ChessGame currentGame = null;
-        for (GameData game: listResult.games()) {
-            if (game.gameID()==joinRequest.gameID()) {
-                currentGame = game.game();
-            }
-        }
-        if (currentGame!=null&&joinRequest.playerColor().equals("WHITE")) {
-            ChessBoard.drawChessBoard(currentGame.getBoard(), false);
-        } else if (currentGame!=null&&joinRequest.playerColor().equals("BLACK")) {
-            ChessBoard.drawChessBoard(currentGame.getBoard(), true);
+    private void displayChessBoard(ChessGame game) {
+//        ChessGame currentGame = null;
+//        for (GameData game: listResult.games()) {
+//            if (game.gameID()==joinRequest.gameID()) {
+//                currentGame = game.game();
+//            }
+//        }
+        if (game!=null&&(playerColor.isEmpty()||playerColor.equals("WHITE"))) {
+            ChessBoard.drawChessBoard(game.getBoard(), false);
+        } else if (game!=null&&playerColor.equals("BLACK")) {
+            ChessBoard.drawChessBoard(game.getBoard(), true);
         } else {
-            throw new ResponseException(400, "Error: no game found");
+            System.out.println("Error: no game found");
         }
+//        if (game!=null&&joinRequest.playerColor().equals("WHITE")) {
+//            ChessBoard.drawChessBoard(game.getBoard(), false);
+//        } else if (game!=null&&joinRequest.playerColor().equals("BLACK")) {
+//            ChessBoard.drawChessBoard(game.getBoard(), true);
+//        } else {
+//            throw new ResponseException(400, "Error: no game found");
+//        }
 
     }
 
-    private static void displayPostLoginUI(PrintStream out, Scanner scanner) {
+    private void initiateWSF(String url) throws ResponseException {
+        wsf = new WebSocketFacade(Client.this, url);
+    }
+
+    private void displayPostLoginUI(PrintStream out, Scanner scanner) {
         while (true) {
             out.println("[Logged In]");
             out.println("\t1. Create Game");
@@ -243,12 +257,13 @@ public class Client {
                         //Send a CONNECT WebSocket message to the server.
                         //Transition to the gameplay UI. The gameplay UI draws the chess board and allows the user to perform the gameplay commands described in the previous section.
                         serverFacade.joinGame(joinRequest, authToken);
-                        wsf = new WebSocketFacade(serverUrl);
+                        initiateWSF(serverUrl);
+                        // wsf = new WebSocketFacade(this, serverUrl);
                         wsf.connect(authToken, joinRequest.gameID(), username);
                         out.println("Successfully joined game " + joinRequest.gameID() + "\n");
+                        playerColor = joinRequest.playerColor();
                         displayGameUI(out, scanner, joinRequest.gameID());
-
-                        displayChessBoard(serverFacade.listGames(authToken), joinRequest);
+                        // displayChessBoard(new ChessGame());
                     } catch (ResponseException e) {
                         out.println(e.getMessage());
                     }
@@ -259,11 +274,7 @@ public class Client {
                         int gameid = scanner.nextInt();
                         JoinGameRequest observeRequest = new JoinGameRequest("WHITE", gameid);
                         scanner.nextLine();
-                        try {
-                            displayChessBoard(serverFacade.listGames(authToken), observeRequest);
-                        } catch (ResponseException e) {
-                            out.println("Error: unable to observe game " + observeRequest.gameID());
-                        }
+                        displayChessBoard(new ChessGame());
                     } else {
                         out.println("Invalid gameID");
                         break;
@@ -296,7 +307,7 @@ public class Client {
         }
     }
 
-    private static void displayGameUI(PrintStream out, Scanner scanner, int gameID) {
+    private void displayGameUI(PrintStream out, Scanner scanner, int gameID) {
         while (true) {
             out.println("[IN GAME]");
             out.println("\t1. Help");
@@ -374,4 +385,15 @@ public class Client {
         }
     }
 
+    private void displayNotification(String msg) {
+        System.out.println(msg);
+    }
+
+    @Override
+    public void notify(ServerMessage serverMessage) {
+        switch (serverMessage.getServerMessageType()) {
+            case LOAD_GAME -> displayChessBoard(((LoadGameMessage) serverMessage).getGame());
+            case NOTIFICATION -> displayNotification(((NotificationMessage) serverMessage).getNotification());
+        }
+    }
 }

@@ -142,7 +142,7 @@ public class HTTPCommunicator {
     }
 
     private void writeBody(Object request, HttpURLConnection connection) throws IOException {
-         String jsonRequest = new Gson().toJson(request);
+        String jsonRequest = new Gson().toJson(request);
         try(OutputStream requestBody = connection.getOutputStream()) {
             requestBody.write(jsonRequest.getBytes());
         }
